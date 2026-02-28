@@ -126,8 +126,8 @@ export default function Navbar() {
                   : {
                       border:      "1px solid transparent",
                       color:       "#ffffff",
-                      background:  ctaHovered ? "#9B1527" : "#C41E3A",
-                      boxShadow:   ctaHovered ? "0 4px 18px rgba(196,30,58,0.32)" : "none",
+                      background:  ctaHovered ? "#7A0014" : "#960018",
+                      boxShadow:   ctaHovered ? "0 4px 18px rgba(150,0,24,0.32)" : "none",
                       transform:   ctaHovered ? "translateY(-1px)" : "none",
                       transition:  "all 0.25s ease",
                     }
@@ -210,7 +210,7 @@ export default function Navbar() {
                   <div className="flex items-center gap-3.5">
                     <span
                       className="font-mono text-[10px] font-semibold w-5"
-                      style={{ color: active ? "#C41E3A" : "rgba(10,10,10,0.22)" }}
+                      style={{ color: active ? "#960018" : "rgba(10,10,10,0.22)" }}
                     >
                       {link.num}
                     </span>
@@ -223,7 +223,7 @@ export default function Navbar() {
                   </div>
                   <svg
                     className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
-                    style={{ color: active ? "#C41E3A" : "rgba(10,10,10,0.18)" }}
+                    style={{ color: active ? "#960018" : "rgba(10,10,10,0.18)" }}
                     fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />

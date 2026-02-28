@@ -103,7 +103,7 @@ export default function Credibilite() {
               className="object-cover object-center"
               sizes="(min-width: 1280px) 1200px, 100vw"
             />
-            <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.10) 0%, transparent 40%, rgba(123,16,40,0.68) 100%)" }} />
+            <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.10) 0%, transparent 40%, rgba(92,0,15,0.68) 100%)" }} />
           </div>
         </Reveal>
 

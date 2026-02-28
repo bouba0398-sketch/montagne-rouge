@@ -21,8 +21,9 @@ No test runner is configured.
 **Path alias:** `@/*` maps to the project root.
 
 **Color system** — defined in `app/globals.css` via `@theme`:
-- `bg-rouge` / `text-rouge` → `#C41E3A` (brand red)
-- `bg-rouge-dark` / `text-rouge-dark` → `#9B1527`
+- `bg-rouge` / `text-rouge` → `#960018` (carmin primary)
+- `bg-rouge-dark` / `text-rouge-dark` → `#7A0014`
+- Section backgrounds use `.section-bordeaux` CSS class (CSS vars: `--color-mr-bg` `#7A0014`, `--color-mr-bg-dk` `#5C000F`, `--color-mr-bg-lt` `#B02030`, `--color-mr-cta` `#C8102E`)
 - Use Tailwind utilities (`bg-black`, `text-white`, `bg-gray-50`, etc.) for everything else.
 
 **Custom animation** — `.step-animate` class defined in `globals.css` for the multi-step form fade-in.

@@ -2,37 +2,18 @@
 
 @theme {
   /* ── Accent red — icons, text, small UI elements only ── */
-  --color-rouge:      #C41E3A;
-  --color-rouge-dark: #9B1527;
+  --color-rouge:      #960018;
+  --color-rouge-dark: #7A0014;
 
-  /* ── Large-section bordeaux palette ───────────────────
-     THREE OPTIONS — uncomment one block to switch.
-
-     Option A ✅ DEFAULT — Bordeaux premium, slightly desaturated.
-       Balanced wine-red. Less saturated than rouge → feels premium
-       and grown-up without being cold or dark. Best general choice.
+  /* ── Large-section carmin palette ─────────────────────
+     Harvard/Liverpool-inspired deep carmin red.
+     Primary: #960018 · Dark: #7A0014 · Deep: #5C000F
+     Soft accent: #B02030 · CTA: #C8102E
   */
-  --color-mr-bg:    #7B1028;
-  --color-mr-bg-dk: #6A0D22;
-  --color-mr-bg-lt: #8D1530;
-
-  /*
-     Option B — One step deeper/darker.
-       Near-maroon territory. Very serious, ultra-premium feel.
-       Best if the site wants maximum authority and sobriety.
-  --color-mr-bg:    #650D1B;
-  --color-mr-bg-dk: #580A16;
-  --color-mr-bg-lt: #720E1D;
-  */
-
-  /*
-     Option C — Warmer bordeaux.
-       Slightly more hue/warmth than A. Vibrant yet refined,
-       less austere. Best if the site should feel a bit more alive.
-  --color-mr-bg:    #821830;
-  --color-mr-bg-dk: #711329;
-  --color-mr-bg-lt: #8E1A33;
-  */
+  --color-mr-bg:    #7A0014;
+  --color-mr-bg-dk: #5C000F;
+  --color-mr-bg-lt: #B02030;
+  --color-mr-cta:   #C8102E;
 
   --font-sans:    var(--font-geist-sans);
   --font-mono:    var(--font-geist-mono);
@@ -54,7 +35,7 @@ body {
 }
 
 ::selection {
-  background: rgba(196, 30, 58, 0.12);
+  background: rgba(150, 0, 24, 0.12);
   color: #0a0a0a;
 }
 
@@ -274,13 +255,13 @@ body {
 .card-accent-line {
   height:     1px;
   width:      28px;
-  background: rgba(196, 30, 58, 0.22);
+  background: rgba(150, 0, 24, 0.22);
   transition: width 0.5s ease, background 0.5s ease;
 }
 
 .credibility-card:hover .card-accent-line {
   width:      52px;
-  background: rgba(196, 30, 58, 0.50);
+  background: rgba(150, 0, 24, 0.50);
 }
 
 /* ── Generic premium card hover ────────────────────────────
@@ -300,7 +281,7 @@ body {
   box-shadow:
     0 20px 50px rgba(0, 0, 0, 0.09),
     0  4px 16px rgba(0, 0, 0, 0.05);
-  border-color: rgba(196, 30, 58, 0.15);
+  border-color: rgba(150, 0, 24, 0.15);
 }
 
 /* ── CTA section buttons ───────────────────────────────── */
@@ -394,7 +375,7 @@ body {
   width:         3px;
   height:        3px;
   border-radius: 50%;
-  background:    #C41E3A;
+  background:    #960018;
   opacity:       0;
   transform:     scale(0.1);
   transition:    opacity 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);

@@ -1,26 +1,340 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+@theme {
+  --color-rouge: #C41E3A;
+  --color-rouge-dark: #9B1527;
+  /* Premium bordeaux — replaces pinkish rouge on large dark sections */
+  --color-mr-red-900: #8B1020;
+  --color-mr-red-800: #7A0D1B;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-playfair), Georgia, serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Base ──────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #ffffff;
+  color: #0a0a0a;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
+
+::selection {
+  background: rgba(196, 30, 58, 0.12);
+  color: #0a0a0a;
+}
+
+/* ── Hero entrance animations ──────────────────────────── */
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Calm hero panel reveal — 10px lift, 1s ease-out */
+@keyframes hero-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Multi-step form step transition ───────────────────── */
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.step-animate {
+  animation: step-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ── B: Hero glass panel ──────────────────────────────────
+  .hero-glass-panel is a direct child of <section> with no
+  transformed ancestor — this is what makes backdrop-filter
+  actually work (stacking context was blocking it before).
+  Position + size synced to the text block via useLayoutEffect.
+*/
+.hero-glass-panel {
+  border-radius: 20px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(0, 0, 0, 0.26);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 40px 80px rgba(0, 0, 0, 0.30),
+    0 10px 30px rgba(0, 0, 0, 0.18);
+  animation: glass-float 8s ease-in-out infinite;
+}
+
+@keyframes glass-float {
+  from { transform: translateY(0px)  translateZ(0); }
+  to   { transform: translateY(-6px) translateZ(0); }
+}
+
+/* Shadow breathes with the float — physically accurate elevation model.
+   Card at rest ≈ 50px above background. At float peak (+22px) ≈ 72px.
+   Shadow offset, blur, and opacity all scale with elevation distance. */
+@keyframes float-shadow {
+  from {
+    box-shadow:
+      0 50px 100px rgba(0, 0, 0, 0.24),
+      0 16px  40px rgba(0, 0, 0, 0.14),
+      0  4px  12px rgba(0, 0, 0, 0.08);
+  }
+  to {
+    box-shadow:
+      0 56px 112px rgba(0, 0, 0, 0.21),
+      0 18px  44px rgba(0, 0, 0, 0.12),
+      0  5px  14px rgba(0, 0, 0, 0.07);
+  }
+}
+
+/* hero-text-wrapper is now just a layout container */
+.hero-text-wrapper {
+  position: relative;
+}
+
+/* ── A: Cinematic sunlight — slow horizontal drift ─────── */
+/*
+  Colors: rgba(255,255,255,0.12) + rgba(255,80,80,0.08) + transparent
+  blend-mode overlay: enriches image without adding a tint layer.
+  20s loop, almost imperceptible — atmosphere not effect.
+*/
+.hero-sunlight {
+  background: radial-gradient(
+    ellipse 55% 75% at 50% 50%,
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 80, 80, 0.08) 45%,
+    transparent 70%
+  );
+  animation: sunlight-drift 20s ease-in-out infinite;
+  mix-blend-mode: overlay;
+}
+
+@keyframes sunlight-drift {
+  0%   { transform: translateX(-35%) translateY(5%);  opacity: 0.5; }
+  40%  { transform: translateX(10%)  translateY(-8%); opacity: 1;   }
+  70%  { transform: translateX(45%)  translateY(5%);  opacity: 0.65;}
+  100% { transform: translateX(-35%) translateY(5%);  opacity: 0.5; }
+}
+
+/* ── Micro particles ───────────────────────────────────── */
+.hero-particle {
+  background: rgba(255, 255, 255, 0.55);
+  animation: particle-float linear infinite;
+}
+
+@keyframes particle-float {
+  0%   { transform: translateY(0)    translateX(0);   opacity: 0;   }
+  15%  { opacity: 0.55; }
+  80%  { opacity: 0.45; }
+  100% { transform: translateY(-90px) translateX(18px); opacity: 0; }
+}
+
+/* ── Glass card sheen reflection ──────────────────────────
+   A large, very soft radial light blob that drifts diagonally
+   across the glass surface. Max opacity 8% — present but
+   never distracting. Simulates ambient sunlight on premium glass.
+*/
+.glass-sheen {
+  background: radial-gradient(
+    ellipse 65% 55% at 50% 50%,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.03) 45%,
+    transparent 72%
+  );
+  animation: glass-sheen-drift 9s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes glass-sheen-drift {
+  0%   { transform: translate(-30%, -20%) translateZ(0); opacity: 0;   }
+  18%  { opacity: 1;   }
+  50%  { transform: translate(18%,  22%)  translateZ(0); opacity: 0.9; }
+  82%  { opacity: 1;   }
+  100% { transform: translate(-30%, -20%) translateZ(0); opacity: 0;   }
+}
+
+/* ── Credibility section — cards ──────────────────────── */
+/*
+  All hover interactions live here so Credibilite.tsx stays
+  a server component (no event handlers needed in JSX).
+*/
+
+/* Slow, very subtle vertical float — each card uses a different
+   duration + delay via inline style for an organic, non-mechanical feel */
+@keyframes card-float {
+  0%, 100% { transform: translateY(0px);  }
+  50%       { transform: translateY(-3px); }
+}
+
+/* Card base state — white card floating on rouge background */
+.credibility-card {
+  box-shadow: 0 4px 28px rgba(0, 0, 0, 0.14);
+  transition:
+    transform     0.55s cubic-bezier(0.34, 1.1, 0.64, 1),
+    box-shadow    0.55s ease,
+    border-color  0.4s  ease;
+}
+
+/* Card hover — strong lift off the red surface */
+.credibility-card:hover {
+  transform:    translateY(-8px);
+  box-shadow:
+    0 32px 80px rgba(0, 0, 0, 0.24),
+    0  8px 28px rgba(0, 0, 0, 0.14);
+  border-color: rgba(0, 0, 0, 0.10);
+}
+
+/* Red accent line below the card title */
+.card-accent-line {
+  height:     1px;
+  width:      28px;
+  background: rgba(196, 30, 58, 0.22);
+  transition: width 0.5s ease, background 0.5s ease;
+}
+
+.credibility-card:hover .card-accent-line {
+  width:      52px;
+  background: rgba(196, 30, 58, 0.50);
+}
+
+/* ── CTA section buttons ───────────────────────────────── */
+/*
+  Hover + active states live in CSS so InscriptionCTA.tsx stays
+  a Server Component. Same pattern as .credibility-card.
+*/
+
+/* Primary — white pill with rouge text */
+.cta-btn-primary {
+  transition:
+    background   0.18s ease,
+    box-shadow   0.20s ease,
+    transform    0.15s ease;
+}
+
+.cta-btn-primary:hover {
+  background:  rgba(255, 255, 255, 0.92);
+  box-shadow:  0 12px 36px rgba(0, 0, 0, 0.20);
+  transform:   translateY(-1px);
+}
+
+.cta-btn-primary:active {
+  background:  rgba(255, 255, 255, 0.86);
+  box-shadow:  0 4px 12px rgba(0, 0, 0, 0.12);
+  transform:   translateY(0) scale(0.975);
+}
+
+/* Secondary — ghost outline pill */
+.cta-btn-secondary {
+  transition:
+    background     0.18s ease,
+    border-color   0.18s ease,
+    transform      0.15s ease;
+}
+
+.cta-btn-secondary:hover {
+  background:    rgba(255, 255, 255, 0.10);
+  border-color:  rgba(255, 255, 255, 0.42);
+}
+
+.cta-btn-secondary:active {
+  background:    rgba(255, 255, 255, 0.16);
+  transform:     scale(0.975);
+}
+
+/* ── Grain texture ─────────────────────────────────────── */
+/*
+  Repeating SVG fractalNoise pattern used as a subtle overlay.
+  Applied via mix-blend-mode: overlay at low opacity — adds organic
+  texture to gradients without flattening or dulling them.
+*/
+.grain-texture {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='4' stitchTiles='stitch'/%3E%3C/feTurbulence%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 220px 220px;
+}
+
+/* ── Navbar links ──────────────────────────────────────── */
+/*
+  Two states: .nav-transparent (over hero) and .nav-solid (scrolled / other pages).
+  The class switches on the <Link> element via React state — CSS handles the hover.
+*/
+.nav-link {
+  position:       relative;
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            5px;
+  font-size:      13px;
+  font-weight:    500;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  transition:     color 0.45s ease;
+  white-space:    nowrap;
+}
+
+/* Transparent state — white text over hero */
+.nav-link.nav-transparent        { color: rgba(255, 255, 255, 0.60); }
+.nav-link.nav-transparent.nav-active { color: rgba(255, 255, 255, 0.95); }
+.nav-link.nav-transparent:hover  { color: rgba(255, 255, 255, 0.95); }
+
+/* Solid state — dark text on glass */
+.nav-link.nav-solid              { color: rgba(10, 10, 10, 0.44); }
+.nav-link.nav-solid.nav-active   { color: #0a0a0a; }
+.nav-link.nav-solid:hover        { color: #0a0a0a; }
+
+/* Active indicator dot */
+.nav-dot {
+  display:       block;
+  width:         3px;
+  height:        3px;
+  border-radius: 50%;
+  background:    #C41E3A;
+  opacity:       0;
+  transform:     scale(0.1);
+  transition:    opacity 0.3s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.nav-link.nav-active .nav-dot {
+  opacity:   1;
+  transform: scale(1);
+}
+
+/* ── Scroll indicator bounce ───────────────────────────── */
+@keyframes indicator-drop {
+  0%, 100% { transform: translateY(0); opacity: 0.4; }
+  50%       { transform: translateY(6px); opacity: 0.7; }
+}
+
+.scroll-indicator {
+  animation: indicator-drop 2s ease-in-out infinite;
+}
+

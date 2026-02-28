@@ -450,6 +450,50 @@ body {
   }
 }
 
+/* ── Actualités full page — card grid ─────────────────────
+   news-page-card: used on /actualites grid.
+   card-in keyframe: fires on mount + on filter change (via React key).
+   Hover lift only when motion is allowed.
+──────────────────────────────────────────────────────────── */
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.news-page-card {
+  animation: card-in 0.45s ease both;
+  transition:
+    transform      0.25s ease,
+    border-color   0.25s ease,
+    box-shadow     0.25s ease;
+}
+
+.news-page-card:hover {
+  transform:    translateY(-6px);
+  border-color: rgba(255,255,255,0.13) !important;
+  box-shadow:   0 20px 56px rgba(0,0,0,0.50) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .news-page-card {
+    animation: none;
+  }
+  .news-page-card:hover {
+    transform: none;
+  }
+}
+
+/* ── Filter bar scroll — hide scrollbar ─────────────────── */
+.news-filter-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-bottom: 2px;
+}
+
+.news-filter-scroll::-webkit-scrollbar {
+  display: none;
+}
+
 /* ── Scroll indicator bounce ───────────────────────────── */
 @keyframes indicator-drop {
   0%, 100% { transform: translateY(0); opacity: 0.4; }

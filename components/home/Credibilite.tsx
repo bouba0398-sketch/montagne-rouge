@@ -54,13 +54,10 @@ const pillars = [
 
 export default function Credibilite() {
   return (
-    <section
-      className="py-28 lg:py-36 relative overflow-hidden"
-      style={{ background: "linear-gradient(168deg, #7A0D1B 0%, #8B1020 35%, #8B1020 65%, #741019 100%)" }}
-    >
+    <section className="section-bordeaux py-28 lg:py-36 relative overflow-hidden">
 
-      {/* Subtle grain texture — premium depth at 2.5% opacity */}
-      <div className="grain-texture absolute inset-0 pointer-events-none" style={{ opacity: 0.025 }} aria-hidden />
+      {/* Grain texture — premium depth, opacity 2% — never on hero */}
+      <div className="grain-texture absolute inset-0 pointer-events-none" style={{ opacity: 0.02 }} aria-hidden />
 
       {/* ── Ghost letter ── */}
       <div
@@ -106,7 +103,7 @@ export default function Credibilite() {
               className="object-cover object-center"
               sizes="(min-width: 1280px) 1200px, 100vw"
             />
-            <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.10) 0%, transparent 40%, rgba(139,16,32,0.68) 100%)" }} />
+            <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.10) 0%, transparent 40%, rgba(123,16,40,0.68) 100%)" }} />
           </div>
         </Reveal>
 

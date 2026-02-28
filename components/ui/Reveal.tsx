@@ -19,6 +19,12 @@ export default function Reveal({
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
+    // Respect prefers-reduced-motion: skip animation, show immediately
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setVisible(true);
+      return;
+    }
+
     const el = ref.current;
     if (!el) return;
     const io = new IntersectionObserver(
@@ -39,10 +45,10 @@ export default function Reveal({
       ref={ref}
       className={className}
       style={{
-        transitionDelay: `${delay}ms`,
-        opacity: visible ? 1 : 0,
-        transform: visible ? "none" : `translateY(${y}px)`,
-        transition: "opacity 0.75s ease, transform 0.75s ease",
+        transitionDelay:  `${delay}ms`,
+        opacity:          visible ? 1 : 0,
+        transform:        visible ? "none" : `translateY(${y}px)`,
+        transition:       "opacity 0.65s ease, transform 0.65s ease",
       }}
     >
       {children}

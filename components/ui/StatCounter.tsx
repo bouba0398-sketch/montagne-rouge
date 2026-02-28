@@ -25,11 +25,19 @@ export default function StatCounter({ raw, className = "", style }: Props) {
     const el = ref.current;
     if (!el) return;
 
+    // Respect prefers-reduced-motion: show final value immediately
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && !started.current) {
           started.current = true;
           io.unobserve(el);
+
+          if (reduced) {
+            setCount(target);
+            return;
+          }
 
           const duration = 1400;
           const startTime = performance.now();

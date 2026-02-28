@@ -1,13 +1,41 @@
 @import "tailwindcss";
 
 @theme {
-  --color-rouge: #C41E3A;
+  /* ── Accent red — icons, text, small UI elements only ── */
+  --color-rouge:      #C41E3A;
   --color-rouge-dark: #9B1527;
-  /* Premium bordeaux — replaces pinkish rouge on large dark sections */
-  --color-mr-red-900: #8B1020;
-  --color-mr-red-800: #7A0D1B;
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  /* ── Large-section bordeaux palette ───────────────────
+     THREE OPTIONS — uncomment one block to switch.
+
+     Option A ✅ DEFAULT — Bordeaux premium, slightly desaturated.
+       Balanced wine-red. Less saturated than rouge → feels premium
+       and grown-up without being cold or dark. Best general choice.
+  */
+  --color-mr-bg:    #7B1028;
+  --color-mr-bg-dk: #6A0D22;
+  --color-mr-bg-lt: #8D1530;
+
+  /*
+     Option B — One step deeper/darker.
+       Near-maroon territory. Very serious, ultra-premium feel.
+       Best if the site wants maximum authority and sobriety.
+  --color-mr-bg:    #650D1B;
+  --color-mr-bg-dk: #580A16;
+  --color-mr-bg-lt: #720E1D;
+  */
+
+  /*
+     Option C — Warmer bordeaux.
+       Slightly more hue/warmth than A. Vibrant yet refined,
+       less austere. Best if the site should feel a bit more alive.
+  --color-mr-bg:    #821830;
+  --color-mr-bg-dk: #711329;
+  --color-mr-bg-lt: #8E1A33;
+  */
+
+  --font-sans:    var(--font-geist-sans);
+  --font-mono:    var(--font-geist-mono);
   --font-display: var(--font-playfair), Georgia, serif;
 }
 
@@ -28,6 +56,35 @@ body {
 ::selection {
   background: rgba(196, 30, 58, 0.12);
   color: #0a0a0a;
+}
+
+/* ── Section bordeaux ──────────────────────────────────────
+   Applied to ALL large red background sections (Credibilite,
+   Stats, InscriptionCTA). Never applied to the hero.
+   Gradient is a subtle 168° diagonal — max delta ~10% brightness.
+   Grain layer is a separate div added inside each section.
+──────────────────────────────────────────────────────────── */
+.section-bordeaux {
+  background: linear-gradient(
+    168deg,
+    var(--color-mr-bg-dk) 0%,
+    var(--color-mr-bg)    35%,
+    var(--color-mr-bg)    65%,
+    var(--color-mr-bg-dk) 100%
+  );
+}
+
+/* ── Prefers-reduced-motion ────────────────────────────────
+   Suppresses all transitions and animations globally
+   when the user has opted for reduced motion.
+──────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration:        0.01ms !important;
+    animation-iteration-count: 1      !important;
+    transition-duration:       0.01ms !important;
+    scroll-behavior:           auto   !important;
+  }
 }
 
 /* ── Hero entrance animations ──────────────────────────── */
@@ -224,6 +281,26 @@ body {
 .credibility-card:hover .card-accent-line {
   width:      52px;
   background: rgba(196, 30, 58, 0.50);
+}
+
+/* ── Generic premium card hover ────────────────────────────
+   Reusable on any white card. Provides subtle lift + soft
+   rouge border glow. Compatible with prefers-reduced-motion
+   because the @media rule above zeroes transition-duration.
+──────────────────────────────────────────────────────────── */
+.card-hover {
+  transition:
+    transform      0.30s cubic-bezier(0.34, 1.1, 0.64, 1),
+    box-shadow     0.30s ease,
+    border-color   0.25s ease;
+}
+
+.card-hover:hover {
+  transform:    translateY(-3px);
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.09),
+    0  4px 16px rgba(0, 0, 0, 0.05);
+  border-color: rgba(196, 30, 58, 0.15);
 }
 
 /* ── CTA section buttons ───────────────────────────────── */

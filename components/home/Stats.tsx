@@ -10,10 +10,7 @@ const stats = [
 
 export default function Stats() {
   return (
-    <section
-      className="py-20 lg:py-28 relative overflow-hidden border-t border-white/8"
-      style={{ background: "linear-gradient(168deg, #841219 0%, #8B1020 50%, #7A0D1B 100%)" }}
-    >
+    <section className="section-bordeaux py-20 lg:py-28 relative overflow-hidden border-t border-white/8">
 
       {/* ── Ghost letter ── */}
       <div

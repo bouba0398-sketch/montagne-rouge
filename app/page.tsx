@@ -1,15 +1,27 @@
 import type { Metadata } from "next";
-import Hero from "@/components/home/Hero";
-import Credibilite from "@/components/home/Credibilite";
-import Stats from "@/components/home/Stats";
-import Pedagogie from "@/components/home/Pedagogie";
-import Actualites from "@/components/home/Actualites";
-import Niveaux from "@/components/home/Niveaux";
+import Hero          from "@/components/home/Hero";
+import Credibilite   from "@/components/home/Credibilite";
+import Stats         from "@/components/home/Stats";
+import Niveaux       from "@/components/home/Niveaux";
 import GaleriePreview from "@/components/home/GaleriePreview";
+import Actualites    from "@/components/home/Actualites";
 import InscriptionCTA from "@/components/home/InscriptionCTA";
-import CampusInfra from "@/components/home/CampusInfra";
-import Temoignages from "@/components/home/Temoignages";
 
+/*
+  Homepage narrative order (7 sections):
+  1. Hero           — cinematic video
+  2. Credibilite    — "Pourquoi Montagne Rouge" (4 proof cards, bordeaux bg)
+  3. Stats          — Chiffres clés animated (bordeaux bg, visually joined)
+  4. Niveaux        — Parcours élève maternelle → lycée
+  5. GaleriePreview — Vie à l'école (chips + 9 images)
+  6. Actualites     — Actualités récentes
+  7. InscriptionCTA — Final CTA admissions (bordeaux bg)
+
+  Removed (redundant):
+  - Pedagogie    → 4 method cards = Credibilite, journey = Niveaux, stats = Stats
+  - CampusInfra  → campus shown in gallery; doesn't advance narrative
+  - Temoignages  → second CTA block duplicated InscriptionCTA
+*/
 export const metadata: Metadata = {
   title: "Montagne Rouge — École Internationale Privée à Dakar",
   description:
@@ -22,13 +34,10 @@ export default function Home() {
       <Hero />
       <Credibilite />
       <Stats />
-      <Pedagogie />
-      <Actualites />
       <Niveaux />
       <GaleriePreview />
+      <Actualites />
       <InscriptionCTA />
-      <CampusInfra />
-      <Temoignages />
     </main>
   );
 }

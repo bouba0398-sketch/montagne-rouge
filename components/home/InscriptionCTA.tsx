@@ -4,7 +4,10 @@ import Reveal from "@/components/ui/Reveal";
 
 export default function InscriptionCTA() {
   return (
-    <section className="py-24 lg:py-32 bg-rouge relative overflow-hidden">
+    <section className="section-bordeaux py-24 lg:py-32 relative overflow-hidden">
+
+      {/* Grain — same opacity as other bordeaux sections */}
+      <div className="grain-texture absolute inset-0 pointer-events-none" style={{ opacity: 0.02 }} aria-hidden />
 
       {/* ── Background photo ── */}
       <Image

@@ -68,7 +68,7 @@ export default function InscriptionCTA() {
 
               {/* Primary */}
               <Link
-                href="/admissions/demande"
+                href="/inscriptions"
                 className="cta-btn-primary group inline-flex items-center justify-center gap-2 bg-white text-rouge font-semibold px-8 py-4 rounded-full text-[13px] w-full sm:w-auto"
               >
                 Commencer ma demande

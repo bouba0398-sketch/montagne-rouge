@@ -213,7 +213,7 @@ export default function Hero() {
 
               {/* CTAs */}
               <div className="flex flex-col sm:flex-row gap-3 mb-5">
-                <Link href="/admissions/demande"
+                <Link href="/inscriptions"
                   className="group inline-flex items-center justify-center gap-2 bg-rouge text-white font-semibold px-7 py-3.5 rounded-full text-[13px] hover:bg-rouge-dark transition-all duration-200 hover:shadow-lg hover:shadow-rouge/30 hover:-translate-y-px">
                   Inscriptions ouvertes
                   <svg className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

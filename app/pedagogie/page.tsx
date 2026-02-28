@@ -152,7 +152,7 @@ export default function PedagogiePage() {
               <Reveal delay={200}>
                 <div className="flex flex-col sm:flex-row gap-3.5 mb-10">
                   <Link
-                    href="/admissions/demande"
+                    href="/inscriptions/nouvelle-inscription"
                     className="inline-flex items-center justify-center gap-2 bg-rouge text-white font-semibold px-8 py-4 rounded-full text-[13px] hover:bg-rouge-dark transition-all duration-200 hover:shadow-lg hover:shadow-rouge/25 active:scale-[0.97]"
                   >
                     Demander une admission
@@ -681,7 +681,7 @@ export default function PedagogiePage() {
             <Reveal delay={240}>
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-3.5">
                 <Link
-                  href="/admissions/demande"
+                  href="/inscriptions/nouvelle-inscription"
                   className="cta-btn-primary group inline-flex items-center justify-center gap-2 bg-white text-rouge font-semibold px-8 py-4 rounded-full text-[13px] w-full sm:w-auto"
                 >
                   Commencer ma demande

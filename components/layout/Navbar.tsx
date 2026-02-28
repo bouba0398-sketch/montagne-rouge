@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 const links = [
   { href: "/ecole",      label: "L'École",    num: "01" },
   { href: "/pedagogie",  label: "Pédagogie",  num: "02" },
-  { href: "/admissions", label: "Admissions", num: "03" },
+  { href: "/inscriptions", label: "Inscriptions", num: "03" },
   { href: "/galerie",    label: "Galerie",    num: "04" },
   { href: "/actualites", label: "Actualités", num: "05" },
   { href: "/contact",    label: "Contact",    num: "06" },
@@ -111,7 +111,7 @@ export default function Navbar() {
 
             {/* Desktop CTA */}
             <Link
-              href="/admissions/demande"
+              href="/inscriptions"
               className="hidden lg:inline-flex items-center gap-1.5 rounded-full text-[13px] font-semibold px-5 py-2.5"
               onMouseEnter={() => setCtaHovered(true)}
               onMouseLeave={() => setCtaHovered(false)}
@@ -242,10 +242,10 @@ export default function Navbar() {
               }}
             >
               <Link
-                href="/admissions/demande"
+                href="/inscriptions"
                 className="flex items-center justify-center gap-2 w-full bg-rouge text-white text-[14px] font-semibold py-4 rounded-2xl hover:bg-rouge-dark transition-colors duration-200"
               >
-                Demander une admission
+                Démarrer une inscription
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>

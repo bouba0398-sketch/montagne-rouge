@@ -507,16 +507,16 @@ export default function EcolePage() {
           <Reveal delay={140}>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="/admissions/demande"
+                href="/inscriptions/nouvelle-inscription"
                 className="inline-flex items-center justify-center bg-white text-rouge font-semibold px-8 py-4 rounded-full text-[13px] hover:bg-white/90 transition-all duration-200 hover:shadow-xl hover:shadow-black/20 active:scale-[0.97]"
               >
-                Demande d&apos;admission
+                Nouvelle inscription
               </Link>
               <Link
-                href="/admissions"
+                href="/inscriptions"
                 className="inline-flex items-center justify-center border border-white/30 text-white font-medium px-8 py-4 rounded-full text-[13px] hover:bg-white/10 transition-all"
               >
-                En savoir plus
+                Toutes les démarches
               </Link>
             </div>
           </Reveal>

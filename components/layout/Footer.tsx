@@ -43,7 +43,7 @@ export default function Footer() {
                 ["/", "Accueil"],
                 ["/ecole", "L'École"],
                 ["/pedagogie", "Pédagogie"],
-                ["/admissions", "Admissions"],
+                ["/inscriptions", "Inscriptions"],
                 ["/galerie", "Galerie"],
                 ["/alumni", "Alumni"],
                 ["/videos", "Vidéos"],

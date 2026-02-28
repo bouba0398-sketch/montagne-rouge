@@ -69,10 +69,10 @@ export default function StickyAdmissionBar() {
           {/* Right — CTA + dismiss */}
           <div className="flex items-center gap-2 shrink-0">
             <Link
-              href="/admissions"
+              href="/inscriptions"
               className="inline-flex items-center gap-1.5 bg-rouge text-white font-semibold text-[12px] px-5 py-2 rounded-full transition-all duration-150 hover:bg-rouge-dark active:scale-[0.97]"
             >
-              Admissions
+              Inscriptions
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>

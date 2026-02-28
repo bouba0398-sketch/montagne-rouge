@@ -386,6 +386,70 @@ body {
   transform: scale(1);
 }
 
+/* ── Stat cards (dark section) ─────────────────────────────
+   6-card metric grid on dark #0f1115 background.
+   Hover: lift + carmin border glow. Server Component safe.
+──────────────────────────────────────────────────────────── */
+.stat-card {
+  transition:
+    transform    0.30s cubic-bezier(0.34, 1.1, 0.64, 1),
+    box-shadow   0.30s ease,
+    border-color 0.25s ease;
+}
+
+.stat-card:hover {
+  transform:    translateY(-4px);
+  box-shadow:
+    0 20px 48px rgba(0, 0, 0, 0.45),
+    0  4px 16px rgba(0, 0, 0, 0.30);
+  border-color: rgba(150, 0, 24, 0.32) !important;
+}
+
+/* ── News cards (dark section) ─────────────────────────────
+   Hover states in CSS so Actualites.tsx stays a Server Component.
+──────────────────────────────────────────────────────────── */
+.news-card {
+  transition:
+    transform    0.30s cubic-bezier(0.34, 1.1, 0.64, 1),
+    box-shadow   0.30s ease,
+    border-color 0.25s ease;
+}
+
+.news-card:hover {
+  transform:    translateY(-8px) scale(1.02);
+  box-shadow:   0 20px 56px rgba(0, 0, 0, 0.45), 0 4px 16px rgba(0, 0, 0, 0.30);
+  border-color: rgba(255, 255, 255, 0.10) !important;
+}
+
+.news-card-urgent:hover {
+  box-shadow:   0 20px 56px rgba(150, 0, 24, 0.22), 0 4px 16px rgba(0, 0, 0, 0.35);
+  border-color: rgba(150, 0, 24, 0.35) !important;
+}
+
+/* ── News carousel auto-scroll ─────────────────────────────
+   Track contains items doubled ([…arr, …arr]).
+   translateX(-50%) shifts exactly one full set → seamless loop.
+   Hover pauses via animation-play-state (Server Component safe).
+──────────────────────────────────────────────────────────── */
+@keyframes news-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.news-carousel-track {
+  animation: news-scroll 36s linear infinite;
+}
+
+.news-carousel-track:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .news-carousel-track {
+    animation: none;
+  }
+}
+
 /* ── Scroll indicator bounce ───────────────────────────── */
 @keyframes indicator-drop {
   0%, 100% { transform: translateY(0); opacity: 0.4; }

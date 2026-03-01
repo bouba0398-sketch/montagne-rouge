@@ -2,18 +2,20 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import Reveal from "@/components/ui/Reveal";
+import PageHero from "@/components/layout/PageHero";
+import { SCHOOL } from "@/lib/school-config";
 
 export const metadata: Metadata = {
   title: "L'École",
   description:
-    "Découvrez l'histoire, les valeurs et la vision de l'école Montagne Rouge à Dakar — institution de référence depuis 1996.",
+    `${SCHOOL.name} — institution privée de référence à ${SCHOOL.addressShort}. De la crèche à la Terminale depuis ${SCHOOL.founded}. ${SCHOOL.stats.bfem} de réussite au ${SCHOOL.stats.bfemLabel} ${SCHOOL.stats.bfemSub}.`,
 };
 
 const stats = [
-  { value: "30", label: "ans d'expertise", sub: "Fondée en 1996" },
-  { value: "500+", label: "élèves", sub: "par année scolaire" },
-  { value: "98%", label: "au baccalauréat", sub: "depuis plus de 10 ans" },
-  { value: "1 500+", label: "diplômés", sub: "accompagnés depuis 1996" },
+  { value: SCHOOL.stats.eleves, label: SCHOOL.stats.elevesLabel, sub: SCHOOL.stats.elevesSub },
+  { value: SCHOOL.stats.annees, label: SCHOOL.stats.anneesLabel, sub: SCHOOL.stats.anneesSub },
+  { value: SCHOOL.stats.bfem,   label: SCHOOL.stats.bfemLabel,   sub: SCHOOL.stats.bfemSub   },
+  { value: SCHOOL.stats.cfee,   label: SCHOOL.stats.cfeeLabel,   sub: SCHOOL.stats.cfeeSub   },
 ];
 
 const histoire = [
@@ -40,7 +42,7 @@ const histoire = [
   {
     year: "2026",
     title: "Aujourd'hui",
-    desc: "Plus de 500 élèves, 30 ans de résultats prouvés, 98% au bac. Montagne Rouge s'impose comme l'institution privée de référence à Dakar.",
+    desc: `${SCHOOL.stats.eleves} élèves, 30 ans de résultats prouvés, ${SCHOOL.stats.bfem} au BFEM 6 ans de suite. Montagne Rouge s'impose comme l'institution privée de référence à Dakar.`,
   },
 ];
 
@@ -85,58 +87,19 @@ const valeurs = [
 
 export default function EcolePage() {
   return (
-    <main className="pt-16 lg:pt-20">
+    <main>
 
-      {/* ── Hero — cinematic ── */}
-      <section className="relative min-h-[60vh] lg:min-h-[72vh] flex items-end overflow-hidden">
-        <Image
-          src="/ecole-hero.jpg"
-          alt="Campus de l'école Montagne Rouge à Dakar"
-          fill
-          className="object-cover object-center"
-          priority
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/10" />
-
-        {/* Ghost letter */}
-        <div
-          className="absolute right-0 top-1/2 -translate-y-1/2 select-none pointer-events-none hidden lg:block"
-          aria-hidden
-          style={{ lineHeight: 0.8 }}
-        >
-          <span
-            className="font-display italic"
-            style={{ fontSize: "30vw", color: "rgba(255,255,255,0.04)" }}
-          >
-            É
-          </span>
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-6 lg:px-10 pb-16 lg:pb-24 w-full">
-          <Reveal>
-            <p className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.18em] uppercase text-white/45 mb-5">
-              <span className="w-1.5 h-1.5 rounded-full bg-white/30 shrink-0" aria-hidden />
-              Notre identité · Depuis 1996
-            </p>
-          </Reveal>
-          <Reveal delay={80}>
-            <h1
-              className="font-display font-semibold tracking-tight text-white leading-tight max-w-3xl"
-              style={{ fontSize: "clamp(36px,5.5vw,72px)" }}
-            >
-              Une école bâtie<br />
-              sur l&apos;excellence.
-            </h1>
-          </Reveal>
-          <Reveal delay={160}>
-            <p className="text-white/55 mt-6 max-w-xl text-[16px] leading-relaxed">
-              Institution privée de référence à Dakar, Montagne Rouge forme les
-              futures générations depuis 30 ans avec rigueur, humanisme et ambition.
-            </p>
-          </Reveal>
-        </div>
-      </section>
+      <PageHero
+        eyebrow="Notre identité · Depuis 1996"
+        title={<>Une école bâtie<br />sur l&apos;excellence.</>}
+        subtitle="Institution privée de référence à Dakar, Montagne Rouge forme les futures générations depuis 30 ans avec rigueur, humanisme et ambition."
+        ctas={[
+          { label: "Demander une inscription", href: "/inscriptions", variant: "primary" },
+          { label: "Notre pédagogie", href: "/pedagogie", variant: "secondary" },
+        ]}
+        image={{ src: "/ecole-hero.jpg", alt: "Campus de l'école Montagne Rouge, Ouakam, Dakar" }}
+        decorativeLetter="É"
+      />
 
       {/* ── Stats bar ── */}
       <section className="py-10 bg-white border-b border-black/6">
@@ -153,6 +116,78 @@ export default function EcolePage() {
                   </div>
                   <p className="text-[13px] font-semibold text-black mb-0.5">{s.label}</p>
                   <p className="text-[11px] text-black/35">{s.sub}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── En bref ── */}
+      <section className="py-16 lg:py-20 bg-[#F8F7F5]">
+        <div className="max-w-7xl mx-auto px-6 lg:px-10">
+          <Reveal className="mb-10">
+            <p className="text-[11px] font-semibold tracking-[0.18em] uppercase text-black/30">
+              En bref
+            </p>
+          </Reveal>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              {
+                icon: (
+                  <svg className="w-5 h-5 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                  </svg>
+                ),
+                value: `${SCHOOL.founded}`,
+                label: "Année de création",
+                desc: `30 ans au service des familles de ${SCHOOL.city}`,
+              },
+              {
+                icon: (
+                  <svg className="w-5 h-5 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+                  </svg>
+                ),
+                value: SCHOOL.stats.eleves,
+                label: "Élèves",
+                desc: `Effectif rentrée ${SCHOOL.year}`,
+              },
+              {
+                icon: (
+                  <svg className="w-5 h-5 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 3.741-1.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" />
+                  </svg>
+                ),
+                value: SCHOOL.levelsShort,
+                label: "Cycle complet",
+                desc: "Crèche, garderie, maternelle, primaire, collège, lycée",
+              },
+              {
+                icon: (
+                  <svg className="w-5 h-5 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 0 0 7.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.25 9.71 2 12 2c2.291 0 4.545.25 6.75.721v1.515M5.25 4.236C6.789 4.092 8.354 4 10 4" />
+                  </svg>
+                ),
+                value: `${SCHOOL.stats.bfem} BFEM`,
+                label: "& 100% CFEE",
+                desc: `${SCHOOL.stats.bfemSub} — certificat élémentaire`,
+              },
+            ].map((card, i) => (
+              <Reveal key={i} delay={i * 70}>
+                <div className="bg-white rounded-2xl border border-black/6 p-7 h-full hover:shadow-lg hover:shadow-black/[0.06] transition-shadow duration-300">
+                  <div className="w-10 h-10 rounded-xl bg-rouge/8 flex items-center justify-center mb-5">
+                    {card.icon}
+                  </div>
+                  <div
+                    className="font-display italic text-rouge leading-none mb-1 tabular-nums"
+                    style={{ fontSize: "clamp(22px,2.2vw,30px)" }}
+                  >
+                    {card.value}
+                  </div>
+                  <p className="text-[14px] font-semibold text-black mb-1">{card.label}</p>
+                  <div className="h-px w-6 bg-rouge/20 mb-2" />
+                  <p className="text-[12px] text-black/40 leading-relaxed">{card.desc}</p>
                 </div>
               </Reveal>
             ))}
@@ -390,7 +425,7 @@ export default function EcolePage() {
                     </svg>
                   ),
                   label: "Contact",
-                  content: "+221 77 000 00 00\ncontact@montagne-rouge.sn",
+                  content: `${SCHOOL.phone}\n${SCHOOL.email}`,
                 },
                 {
                   icon: (

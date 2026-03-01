@@ -1,8 +1,6 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-const TO   = "bouba0398@gmail.com";
+const TO   = process.env.EMAIL_TO ?? "bouba0398@gmail.com";
 const FROM = "Montagne Rouge <onboarding@resend.dev>";
 
 /* ── Rate limiting (in-memory, resets on server restart) ── */
@@ -23,6 +21,16 @@ function isRateLimited(ip: string): boolean {
 }
 
 export async function POST(req: Request) {
+  /* ── Env guard ── */
+  if (!process.env.RESEND_API_KEY) {
+    console.error("[contact] RESEND_API_KEY manquant — configurer la variable d'environnement sur Vercel");
+    return Response.json(
+      { ok: false, error: "Service d'email temporairement indisponible." },
+      { status: 503 }
+    );
+  }
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
   try {
     /* ── Rate limit ── */
     const ip =

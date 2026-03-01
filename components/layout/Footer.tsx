@@ -1,6 +1,5 @@
 import Link from "next/link";
-
-const WHATSAPP = "https://wa.me/221770000000";
+import { SCHOOL } from "@/lib/school-config";
 
 const WHATSAPP_ICON = (
   <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 24 24">
@@ -13,17 +12,22 @@ export default function Footer() {
     <footer className="bg-black text-white">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16 lg:py-20">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
+
           {/* Brand */}
           <div className="md:col-span-5">
-            <div className="font-semibold text-lg mb-3">
-              Montagne <span className="text-rouge">Rouge</span>
+            <div className="font-semibold text-lg mb-1">
+              {SCHOOL.shortName.split(" ")[0]}{" "}
+              <span className="text-rouge">{SCHOOL.shortName.split(" ")[1]}</span>
             </div>
+            <p className="text-white/30 text-[11px] font-medium tracking-wider uppercase mb-4">
+              Groupe Scolaire · Depuis {SCHOOL.founded}
+            </p>
             <p className="text-white/40 text-sm leading-relaxed max-w-xs mb-8">
-              L&apos;école internationale privée de référence à Dakar,
-              formant les leaders de demain depuis plus de 15 ans.
+              École privée à Ouakam, Cité Avion, Dakar.
+              De la crèche à la Terminale depuis {SCHOOL.founded}.
             </p>
             <a
-              href={WHATSAPP}
+              href={SCHOOL.whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-[#25D366] text-white text-sm font-medium px-5 py-3 rounded-full hover:bg-[#1fba58] transition-colors"
@@ -66,31 +70,42 @@ export default function Footer() {
             <h3 className="text-[11px] font-semibold uppercase tracking-wider text-white/25 mb-5">
               Contact
             </h3>
-            <ul className="space-y-3.5 text-sm text-white/40">
-              <li>Dakar, Sénégal</li>
+            <ul className="space-y-3 text-sm text-white/40">
+              <li className="leading-relaxed">{SCHOOL.address}</li>
               <li>
                 <a
-                  href="tel:+221770000000"
+                  href={SCHOOL.phoneHref}
                   className="hover:text-white transition-colors"
                 >
-                  +221 77 000 00 00
+                  {SCHOOL.phone}
                 </a>
               </li>
               <li>
                 <a
-                  href="mailto:contact@montagnerouge.sn"
+                  href={SCHOOL.whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="hover:text-white transition-colors"
                 >
-                  contact@montagnerouge.sn
+                  WhatsApp {SCHOOL.whatsapp}
+                </a>
+              </li>
+              <li>
+                <a
+                  href={SCHOOL.emailHref}
+                  className="hover:text-white transition-colors"
+                >
+                  {SCHOOL.email}
                 </a>
               </li>
             </ul>
           </div>
+
         </div>
 
         <div className="mt-14 pt-8 border-t border-white/8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-white/25">
-            © {new Date().getFullYear()} Montagne Rouge. Tous droits réservés.
+            © {new Date().getFullYear()} {SCHOOL.name}. Tous droits réservés.
           </p>
           <div className="flex gap-6">
             <Link

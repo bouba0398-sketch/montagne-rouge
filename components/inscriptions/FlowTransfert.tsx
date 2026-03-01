@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import FlowShell from "./FlowShell";
-import { Field, Input, Textarea, Select, ChipGroup, StepHeading, SuccessScreen } from "./FlowPrimitives";
+import { Field, Input, Textarea, ChipGroup, StepHeading, SuccessScreen } from "./FlowPrimitives";
 
 const STORAGE_KEY = "mr_flow_transfert";
 

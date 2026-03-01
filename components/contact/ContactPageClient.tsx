@@ -1,14 +1,16 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import { SCHOOL } from "@/lib/school-config";
 
 /* ─────────────────────────────────────────────────────────
    Constants
 ───────────────────────────────────────────────────────── */
+
 const WA_NUMBER  = "33762534321";
-const EMAIL_TO   = "bouba0398@gmail.com";
-const PHONE_DISP = "+33 7 62 53 43 21";
-const PHONE_HREF = "tel:+33762534321";
+const EMAIL_TO   = SCHOOL.email;
+const PHONE_DISP = SCHOOL.phone;
+const PHONE_HREF = SCHOOL.phoneHref;
 
 const TOPICS = [
   {
@@ -75,6 +77,7 @@ export default function ContactPageClient() {
   /* Close modal on Escape */
   useEffect(() => {
     if (!showModal) return;
+    // eslint-disable-next-line react-hooks/immutability
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") closeModal(); };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
@@ -151,59 +154,6 @@ export default function ContactPageClient() {
   /* ─── render ──────────────────────────────────────────── */
   return (
     <>
-      {/* ══ HERO ════════════════════════════════════════════ */}
-      <section
-        className="py-20 lg:py-24 border-b border-black/5"
-        aria-labelledby="contact-heading"
-      >
-        <div className="max-w-7xl mx-auto px-6 lg:px-10">
-          {/* Eyebrow */}
-          <p className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.18em] uppercase text-black/28 mb-5">
-            <span className="w-1.5 h-1.5 rounded-full bg-rouge shrink-0" aria-hidden="true" />
-            Nous joindre
-          </p>
-
-          {/* H1 */}
-          <h1
-            id="contact-heading"
-            className="font-display font-semibold text-black tracking-tight leading-tight mb-4"
-            style={{ fontSize: "clamp(32px,5vw,60px)" }}
-          >
-            Contact
-          </h1>
-
-          {/* Subtitle */}
-          <p className="text-[16px] text-black/45 leading-relaxed max-w-md mb-8">
-            WhatsApp est le moyen le plus rapide.{" "}
-            Sinon, nous répondons sous 24 h ouvrées.
-          </p>
-
-          {/* Hero CTAs */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            <a
-              href={waLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-full text-[14px] font-semibold px-6 py-3.5 bg-rouge text-white transition-all duration-200 hover:bg-rouge-dark hover:shadow-lg hover:-translate-y-px active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rouge/50 focus-visible:ring-offset-2"
-            >
-              <WaIcon cls="w-4 h-4" />
-              Ouvrir WhatsApp
-            </a>
-
-            <button
-              type="button"
-              onClick={() => scrollToForm()}
-              className="inline-flex items-center justify-center gap-2 rounded-full text-[14px] font-semibold px-6 py-3.5 border border-black/12 text-black/65 bg-white transition-all duration-200 hover:border-black/25 hover:text-black active:scale-[0.97]"
-            >
-              Envoyer un message
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </section>
-
       {/* ══ CARDS ═══════════════════════════════════════════ */}
       <section className="py-12 lg:py-16 border-b border-black/5">
         <div className="max-w-7xl mx-auto px-6 lg:px-10">

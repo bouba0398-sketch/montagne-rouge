@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SCHOOL } from "@/lib/school-config";
 import DocsPanel from "./DocsPanel";
+import PageHero from "@/components/layout/PageHero";
 
 const cards = [
   {
@@ -90,26 +91,13 @@ const reassurances = [
 
 export default function InscriptionsHub() {
   return (
-    <main className="pt-16 lg:pt-20">
+    <div>
 
-      {/* ── Hero header ── */}
-      <section className="py-16 lg:py-24 border-b border-black/5">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10 text-center">
-          <p className="inline-flex items-center gap-2 text-[11px] font-semibold tracking-[0.18em] uppercase text-black/30 mb-5">
-            <span className="w-1.5 h-1.5 rounded-full bg-rouge shrink-0" aria-hidden />
-            {SCHOOL.year}
-          </p>
-          <h1
-            className="font-display font-semibold tracking-tight text-black leading-tight mb-4"
-            style={{ fontSize: "clamp(32px,5vw,64px)" }}
-          >
-            Inscriptions {SCHOOL.year}
-          </h1>
-          <p className="text-black/50 text-[16px] max-w-md mx-auto leading-relaxed">
-            Choisissez votre démarche. Démarrez en 2 minutes.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        eyebrow={SCHOOL.year}
+        title={`Inscriptions ${SCHOOL.year}`}
+        subtitle="Choisissez votre démarche. Démarrez en 2 minutes."
+      />
 
       {/* ── 4 choice cards ── */}
       <section className="py-16 lg:py-20 bg-white">
@@ -178,6 +166,6 @@ export default function InscriptionsHub() {
         </div>
       </section>
 
-    </main>
+    </div>
   );
 }

@@ -27,21 +27,23 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   title: {
-    default: "Montagne Rouge — École Internationale Privée à Dakar",
-    template: "%s | Montagne Rouge",
+    default: "Groupe Scolaire Montagne Rouge — École privée à Ouakam, Dakar",
+    template: "%s | Groupe Scolaire Montagne Rouge",
   },
   description:
-    "Montagne Rouge est l'école internationale privée de référence à Dakar, Sénégal. Excellence académique de la maternelle au lycée.",
+    "Groupe Scolaire Montagne Rouge — école privée à Ouakam, Cité Avion, Dakar. De la crèche à la Terminale depuis 1996. 100 % de réussite au BFEM 6 ans de suite.",
   keywords: [
-    "école Dakar",
-    "école internationale Sénégal",
     "école privée Dakar",
-    "Montagne Rouge",
+    "groupe scolaire Ouakam",
+    "Montagne Rouge Dakar",
+    "école Ouakam Cité Avion",
     "inscription scolaire Dakar",
+    "BFEM CFEE Dakar",
   ],
   openGraph: {
-    title: "Montagne Rouge — École Internationale Privée à Dakar",
-    description: "L'excellence académique au cœur de Dakar, Sénégal.",
+    title: "Groupe Scolaire Montagne Rouge — École privée à Ouakam, Dakar",
+    description:
+      "De la crèche à la Terminale depuis 1996. 100 % au BFEM 6 ans de suite. +350 élèves à Ouakam, Cité Avion, Dakar.",
     locale: "fr_SN",
     type: "website",
   },

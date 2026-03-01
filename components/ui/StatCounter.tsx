@@ -2,11 +2,11 @@
 
 import { useRef, useEffect, useState } from "react";
 
-// Parses "500+", "98%", "30" → { value: 500, suffix: "+" }
-function parse(raw: string): { value: number; suffix: string } {
-  const match = raw.match(/^(\d+)([+%]?)$/);
-  if (!match) return { value: 0, suffix: "" };
-  return { value: parseInt(match[1], 10), suffix: match[2] };
+// Parses "+350", "100%", "30" → { prefix: "+", value: 350, suffix: "" }
+function parse(raw: string): { prefix: string; value: number; suffix: string } {
+  const match = raw.match(/^([+]?)(\d+)([+%]?)$/);
+  if (!match) return { prefix: "", value: 0, suffix: "" };
+  return { prefix: match[1], value: parseInt(match[2], 10), suffix: match[3] };
 }
 
 interface Props {
@@ -16,7 +16,7 @@ interface Props {
 }
 
 export default function StatCounter({ raw, className = "", style }: Props) {
-  const { value: target, suffix } = parse(raw);
+  const { prefix, value: target, suffix } = parse(raw);
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
   const started = useRef(false);
@@ -63,7 +63,7 @@ export default function StatCounter({ raw, className = "", style }: Props) {
 
   return (
     <div ref={ref} className={className} style={style}>
-      {count}{suffix}
+      {prefix}{count}{suffix}
     </div>
   );
 }

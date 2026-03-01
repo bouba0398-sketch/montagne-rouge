@@ -20,6 +20,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   // Sync with DOM after mount (DOM was already set by the inline script in <head>)
   useEffect(() => {
     const isDark = document.documentElement.classList.contains("dark");
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTheme(isDark ? "dark" : "light");
   }, []);
 

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import Reveal from "@/components/ui/Reveal";
+import { SCHOOL } from "@/lib/school-config";
 
 export default function InscriptionCTA() {
   return (
@@ -82,7 +83,7 @@ export default function InscriptionCTA() {
 
               {/* Secondary — WhatsApp */}
               <a
-                href="https://wa.me/221770000000"
+                href={SCHOOL.whatsappUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="cta-btn-secondary inline-flex items-center justify-center gap-2 border border-white/25 text-white font-medium px-8 py-4 rounded-full text-[13px] w-full sm:w-auto"

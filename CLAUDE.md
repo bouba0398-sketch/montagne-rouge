@@ -63,11 +63,29 @@ lib/
     cours-vacances.ts   — Vacation course sessions
 ```
 
+## Content & configuration
+
+**Single source of truth for school data:** `lib/school-config.ts`
+- Modify this ONE file to update contact info, stats, address, WhatsApp — changes propagate everywhere.
+- Public alias: `content/school.ts` re-exports `SCHOOL` from `lib/school-config.ts`.
+
+**Replacing images:** Drop files into `/public/images/` using the same filenames defined in `lib/images.ts`.
+```
+/public/images/hero/         — Hero photos (home.jpg, ecole-exterieur.jpg, pedagogie.jpg…)
+/public/images/galerie/      — Gallery: gal-01.jpg … gal-12.jpg
+/public/images/actus/        — News thumbnails: actu-01.jpg … actu-06.jpg
+/public/images/placeholders/ — placeholder.svg (SVG fallback, do not delete)
+```
+
+**Page heroes:** All inner pages use `components/layout/PageHero.tsx`.
+- Props: `eyebrow`, `title` (ReactNode), `subtitle`, `ctas[]`, `image`, `variant` (`light`|`dark`), `decorativeLetter`, `children`.
+- `PageHero` owns navbar compensation (`pt-[68px] lg:pt-[76px]`) — never add `pt-*` to `<main>` on pages that start with `PageHero`.
+
 ## Key conventions
 
 - Server Components by default; add `"use client"` only for interactivity (forms, scroll events, state).
 - All monetary amounts stored as integers in **XOF**. Use `formatXOF()` from `lib/payments` to display.
 - Navbar becomes solid (white bg) on all non-homepage pages and on scroll.
 - The multi-step form advances automatically on card selection (niveau, année) but requires the "Continuer" button for text inputs.
-- Gallery and video tiles currently use placeholder divs — swap with `next/image` once media assets are available.
-- WhatsApp number placeholder: `+221 77 000 00 00` — update in `WhatsAppButton.tsx`, `Footer.tsx`, `InscriptionCTA.tsx`, `contact/page.tsx`, and the form recap.
+- Gallery and video tiles use placeholder divs — swap with `next/image` using paths from `lib/images.ts` once assets are available.
+- **Hero (`components/home/Hero.tsx`) is LOCKED** — do not modify layout, spacing, glass card, or typography.

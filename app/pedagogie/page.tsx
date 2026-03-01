@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import Reveal from "@/components/ui/Reveal";
+import PageHero from "@/components/layout/PageHero";
+import { SCHOOL } from "@/lib/school-config";
 
 export const metadata: Metadata = {
-  title: "Pédagogie — Montagne Rouge",
+  title: "Pédagogie",
   description:
-    "Découvrez la pédagogie d'excellence de Montagne Rouge : méthodes actives, suivi individualisé, discipline et valeurs depuis 1996 à Ouakam, Dakar.",
+    `Pédagogie d'excellence du ${SCHOOL.name} : méthodes actives, suivi individualisé, discipline et valeurs depuis ${SCHOOL.founded} à ${SCHOOL.addressShort}. ${SCHOOL.stats.bfem} au BFEM ${SCHOOL.stats.bfemSub}.`,
 };
 
 // ─────────────────────────────────────────────────────────
@@ -103,10 +105,10 @@ const activites = [
 ];
 
 const outcomes = [
-  { value: "30",     label: "ans d'existence",   sub: "et de méthodes éprouvées" },
-  { value: "98%",    label: "au baccalauréat",    sub: "chaque année depuis 10 ans" },
-  { value: "1 500+", label: "diplômés",           sub: "accompagnés depuis 1996" },
-  { value: "100%",   label: "orientés",           sub: "vers les études supérieures" },
+  { value: SCHOOL.stats.annees, label: "ans d'existence",  sub: "et de méthodes éprouvées" },
+  { value: SCHOOL.stats.bfem,   label: SCHOOL.stats.bfemLabel, sub: SCHOOL.stats.bfemSub },
+  { value: SCHOOL.stats.cfee,   label: SCHOOL.stats.cfeeLabel, sub: SCHOOL.stats.cfeeSub },
+  { value: SCHOOL.stats.eleves, label: SCHOOL.stats.elevesLabel, sub: SCHOOL.stats.elevesSub },
 ];
 
 // ─────────────────────────────────────────────────────────
@@ -115,141 +117,29 @@ const outcomes = [
 
 export default function PedagogiePage() {
   return (
-    <main className="pt-[68px] lg:pt-[76px]">
+    <main>
 
-      {/* ══════════════════════════════════════════════════
-          1. HERO
-      ══════════════════════════════════════════════════ */}
-      <section className="py-20 lg:py-28 bg-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-10">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-14 lg:gap-20 items-center">
-
-            {/* Left — text */}
-            <div>
-              <Reveal>
-                <p className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.18em] uppercase text-black/30 mb-5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-rouge shrink-0" aria-hidden />
-                  Pédagogie · 1996 – 2026
-                </p>
-              </Reveal>
-              <Reveal delay={70}>
-                <h1
-                  className="font-display font-semibold tracking-tight text-black leading-tight mb-6"
-                  style={{ fontSize: "clamp(36px,5vw,68px)" }}
-                >
-                  Une pédagogie<br />
-                  d&apos;excellence<br />
-                  depuis 30 ans
-                </h1>
-              </Reveal>
-              <Reveal delay={140}>
-                <p className="text-[16px] text-black/50 leading-relaxed mb-10 max-w-lg">
-                  Montagne Rouge accompagne les élèves de la maternelle au lycée
-                  avec exigence, discipline et accompagnement personnalisé depuis
-                  plus de trois décennies à Ouakam, Dakar.
-                </p>
-              </Reveal>
-              <Reveal delay={200}>
-                <div className="flex flex-col sm:flex-row gap-3.5 mb-10">
-                  <Link
-                    href="/inscriptions/nouvelle-inscription"
-                    className="inline-flex items-center justify-center gap-2 bg-rouge text-white font-semibold px-8 py-4 rounded-full text-[13px] hover:bg-rouge-dark transition-all duration-200 hover:shadow-lg hover:shadow-rouge/25 active:scale-[0.97]"
-                  >
-                    Demander une admission
-                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                  </Link>
-                  <a
-                    href="https://wa.me/221770000000"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 border border-black/10 text-black/55 font-medium px-8 py-4 rounded-full text-[13px] hover:border-black/20 hover:text-black transition-all"
-                  >
-                    Poser une question
-                  </a>
-                </div>
-                <div className="flex flex-wrap gap-x-5 gap-y-2 border-t border-black/6 pt-6">
-                  {["Maternelle au Lycée", "Enseignants certifiés", "98% au baccalauréat"].map((t) => (
-                    <span key={t} className="flex items-center gap-1.5 text-xs text-black/35">
-                      <svg className="w-3.5 h-3.5 text-rouge/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              </Reveal>
-            </div>
-
-            {/* Right — photo card with overlaid stats */}
-            <Reveal delay={120} className="hidden lg:block">
-              <div className="relative rounded-3xl overflow-hidden h-[320px] lg:h-[480px]">
-
-                {/* Photo */}
-                <Image
-                  src="/pedago-hero.jpg"
-                  alt="Élève concentrée dans une salle de cours moderne"
-                  fill
-                  className="object-cover"
-                  sizes="360px"
-                  priority
-                />
-
-                {/* Gradient overlay — top transparent, bottom near-black */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/92 via-black/40 to-black/15" />
-
-                {/* Ghost "30" */}
-                <div
-                  className="absolute right-0 bottom-0 select-none pointer-events-none"
-                  aria-hidden
-                  style={{ lineHeight: 0.75 }}
-                >
-                  <span
-                    className="font-display italic"
-                    style={{ fontSize: "14rem", color: "rgba(255,255,255,0.06)" }}
-                  >
-                    30
-                  </span>
-                </div>
-
-                {/* Stats + quote overlaid at bottom */}
-                <div className="absolute inset-0 z-10 flex flex-col justify-end p-8">
-                  <div className="grid grid-cols-2 gap-5 mb-7">
-                    {[
-                      { v: "30",   l: "ans d'excellence" },
-                      { v: "98%",  l: "au baccalauréat"  },
-                      { v: "500+", l: "élèves / an"      },
-                      { v: "3–18", l: "ans accompagnés"  },
-                    ].map(({ v, l }) => (
-                      <div key={v}>
-                        <div
-                          className="font-display italic text-rouge leading-none mb-1 tabular-nums"
-                          style={{ fontSize: "clamp(28px,2.2vw,38px)" }}
-                        >
-                          {v}
-                        </div>
-                        <p className="text-white/40 text-[11px]">{l}</p>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="border-t border-white/12 pt-5">
-                    <p className="font-display italic text-white/55 text-[14px] leading-relaxed">
-                      &ldquo;Former l&apos;élève d&apos;aujourd&apos;hui pour en faire
-                      le citoyen de demain.&rdquo;
-                    </p>
-                    <p className="text-white/25 text-[11px] mt-2 font-medium">
-                      — Montagne Rouge, Ouakam
-                    </p>
-                  </div>
-                </div>
-
-              </div>
-            </Reveal>
-
-          </div>
+      <PageHero
+        eyebrow="Pédagogie · 1996 – 2026"
+        title={<>Une pédagogie<br />d&apos;excellence<br />depuis 30 ans</>}
+        subtitle="Montagne Rouge accompagne les élèves de la maternelle au lycée avec exigence, discipline et accompagnement personnalisé depuis plus de trois décennies à Ouakam, Dakar."
+        ctas={[
+          { label: "Demander une admission", href: "/inscriptions/nouvelle-inscription", variant: "primary" },
+          { label: "Poser une question", href: SCHOOL.whatsappUrl, variant: "secondary", external: true },
+        ]}
+        image={{ src: "/pedago-hero.jpg", alt: "Élève concentrée dans une salle de cours moderne" }}
+      >
+        <div className="flex flex-wrap gap-x-5 gap-y-2 border-t border-black/6 pt-6">
+          {["Maternelle au Lycée", "Enseignants certifiés", "98% au baccalauréat"].map((t) => (
+            <span key={t} className="flex items-center gap-1.5 text-xs text-black/35">
+              <svg className="w-3.5 h-3.5 text-rouge/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              {t}
+            </span>
+          ))}
         </div>
-      </section>
+      </PageHero>
 
       {/* ══════════════════════════════════════════════════
           2. PHILOSOPHIE ÉDUCATIVE
@@ -690,7 +580,7 @@ export default function PedagogiePage() {
                   </svg>
                 </Link>
                 <a
-                  href="https://wa.me/221770000000"
+                  href={SCHOOL.whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="cta-btn-secondary inline-flex items-center justify-center gap-2 border border-white/25 text-white font-medium px-8 py-4 rounded-full text-[13px] w-full sm:w-auto"

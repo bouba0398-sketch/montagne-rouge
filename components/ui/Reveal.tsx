@@ -21,6 +21,7 @@ export default function Reveal({
   useEffect(() => {
     // Respect prefers-reduced-motion: skip animation, show immediately
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setVisible(true);
       return;
     }

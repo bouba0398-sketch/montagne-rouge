@@ -4,10 +4,14 @@
   z-50 always renders above z-40 sticky bar.
   Never obstructs other fixed elements — stays right-5 on mobile, right-6 on sm+.
 */
+import { SCHOOL } from "@/lib/school-config";
+
+const WA_HREF = `${SCHOOL.whatsappUrl}?text=${encodeURIComponent("Bonjour Groupe Scolaire Montagne Rouge, je souhaite obtenir des informations.")}`;
+
 export default function WhatsAppButton() {
   return (
     <a
-      href="https://wa.me/33762534321?text=Bonjour%20Montagne%20Rouge%2C%20je%20souhaite%20obtenir%20des%20informations."
+      href={WA_HREF}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Contacter Montagne Rouge sur WhatsApp"

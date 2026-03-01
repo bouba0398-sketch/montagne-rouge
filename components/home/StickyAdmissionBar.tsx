@@ -12,6 +12,7 @@ export default function StickyAdmissionBar() {
   useEffect(() => {
     // Check sessionStorage once on mount
     if (sessionStorage.getItem(DISMISS_KEY)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDismissed(true);
       return;
     }

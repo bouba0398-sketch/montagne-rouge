@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import Link from "next/link";
+import DocumentUpload, { type UploadedDoc } from "@/components/inscriptions/DocumentUpload";
 
 // ─────────────────────────────────────────────────────────
 // TYPES
@@ -45,7 +47,7 @@ interface EnrollmentData {
   tailleUniforme:     string;
   packCompletUniforme: boolean;
   // Step 6 — Documents
-  documents: Record<string, File | null>;
+  uploadedDocs: UploadedDoc[];
 }
 
 const INITIAL: EnrollmentData = {
@@ -58,7 +60,7 @@ const INITIAL: EnrollmentData = {
   quartier: "", ville: "", pays: "Sénégal",
   cantine: "non", etudesDirigees: false, transport: false,
   packFournitures: false, tailleUniforme: "", packCompletUniforme: false,
-  documents: {},
+  uploadedDocs: [],
 };
 
 // ─────────────────────────────────────────────────────────
@@ -76,19 +78,6 @@ const STEPS = [
 ] as const;
 
 const TOTAL = STEPS.length;
-
-// ─────────────────────────────────────────────────────────
-// DOCUMENT LIST
-// ─────────────────────────────────────────────────────────
-
-const DOCS = [
-  { key: "acte_naissance",       label: "Acte de naissance",        required: true,  accept: "image/*,.pdf" },
-  { key: "photos_identite",      label: "Photos d'identité (× 2)",  required: true,  accept: "image/*" },
-  { key: "bulletins_scolaires",  label: "Bulletins scolaires",      required: false, accept: "image/*,.pdf" },
-  { key: "certificat_radiation", label: "Certificat de radiation",  required: false, accept: "image/*,.pdf" },
-  { key: "carnet_vaccination",   label: "Carnet de vaccination",    required: true,  accept: "image/*,.pdf" },
-  { key: "cni_parent",           label: "CNI du parent / tuteur",   required: true,  accept: "image/*,.pdf" },
-];
 
 // ─────────────────────────────────────────────────────────
 // SHARED UI
@@ -136,19 +125,23 @@ const inputCls = [
 
 const selectCls = inputCls + " appearance-none cursor-pointer";
 
-function Btn({ children, onClick, disabled, submit }: {
+function Btn({ children, onClick, disabled, submit, loading }: {
   children: React.ReactNode;
   onClick?: () => void;
   disabled?: boolean;
   submit?: boolean;
+  loading?: boolean;
 }) {
   return (
     <button
       type={submit ? "submit" : "button"}
       onClick={onClick}
-      disabled={disabled}
+      disabled={disabled || loading}
       className="inline-flex items-center justify-center gap-2 bg-rouge text-white font-semibold px-8 py-4 rounded-full text-[13px] hover:bg-rouge-dark transition-all duration-200 hover:shadow-lg hover:shadow-rouge/25 active:scale-[0.97] disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:shadow-none disabled:hover:bg-rouge disabled:active:scale-100"
     >
+      {loading && (
+        <span className="w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin shrink-0" />
+      )}
       {children}
     </button>
   );
@@ -705,79 +698,13 @@ function Step5({ d, u, onNext, onBack }: {
 // STEP 6 — DOCUMENTS
 // ─────────────────────────────────────────────────────────
 
-function FileZone({ docKey, label, required, accept, file, onUpload }: {
-  docKey: string; label: string; required: boolean; accept: string;
-  file: File | null;
-  onUpload: (key: string, f: File | null) => void;
-}) {
-  const ok = !!file;
-  return (
-    <label className={`flex items-center gap-4 p-4 rounded-2xl border-2 border-dashed cursor-pointer transition-all group ${
-      ok ? "border-green-400/60 bg-green-50/40" : "border-black/10 hover:border-rouge/40 hover:bg-rouge/[0.02]"
-    }`}>
-
-      {/* Status icon */}
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
-        ok ? "bg-green-100" : "bg-black/4 group-hover:bg-rouge/8"
-      }`}>
-        {ok ? (
-          <svg className="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-          </svg>
-        ) : (
-          <svg className="w-5 h-5 text-black/25 group-hover:text-rouge/50 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
-          </svg>
-        )}
-      </div>
-
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-0.5">
-          <p className={`text-[13px] font-semibold truncate ${ok ? "text-green-700" : "text-black/70"}`}>
-            {label}
-          </p>
-          {required && !ok && (
-            <span className="text-[9px] font-bold uppercase tracking-wider text-rouge/60 border border-rouge/20 px-1.5 py-0.5 rounded-full shrink-0">Requis</span>
-          )}
-          {ok && (
-            <span className="text-[9px] font-bold uppercase tracking-wider text-green-600 border border-green-300 px-1.5 py-0.5 rounded-full shrink-0">Déposé</span>
-          )}
-        </div>
-        <p className="text-[11px] text-black/35 truncate">
-          {ok ? `${file!.name} · ${(file!.size / 1024).toFixed(0)} Ko` : "Cliquer ou glisser-déposer — PDF ou image"}
-        </p>
-      </div>
-
-      {/* Remove */}
-      {ok && (
-        <button
-          type="button"
-          onClick={(e) => { e.preventDefault(); onUpload(docKey, null); }}
-          className="w-7 h-7 rounded-full bg-black/6 flex items-center justify-center shrink-0 hover:bg-red-100 hover:text-red-500 transition-colors"
-        >
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      )}
-
-      <input type="file" accept={accept} className="hidden" onChange={(e) => onUpload(docKey, e.target.files?.[0] ?? null)} />
-    </label>
-  );
-}
-
 function Step6({ d, u, onNext, onBack }: {
   d: EnrollmentData;
   u: (p: Partial<EnrollmentData>) => void;
   onNext: () => void;
   onBack: () => void;
 }) {
-  const handleUpload = (key: string, file: File | null) =>
-    u({ documents: { ...d.documents, [key]: file } });
-
-  const uploadedCount = DOCS.filter((doc) => !!d.documents[doc.key]).length;
-  const allRequired   = DOCS.filter((doc) => doc.required).every((doc) => !!d.documents[doc.key]);
+  const hasAtLeastOne = d.uploadedDocs.length > 0;
 
   return (
     <div>
@@ -785,38 +712,24 @@ function Step6({ d, u, onNext, onBack }: {
       <SectionHeader
         eyebrow="Étape 6 — Documents"
         title="Pièces justificatives"
-        subtitle="Déposez les documents requis. Les éléments marqués « Requis » sont obligatoires pour valider le dossier."
+        subtitle="Déposez vos documents directement ici. Au moins un fichier requis pour continuer."
       />
 
-      <div className="inline-flex items-center gap-2 bg-black/4 rounded-full px-4 py-2 mb-6">
-        <span className="w-2 h-2 rounded-full bg-rouge/60 shrink-0" />
-        <span className="text-[12px] font-medium text-black/50">
-          {uploadedCount} / {DOCS.length} documents déposés
-        </span>
-      </div>
+      <DocumentUpload
+        uploadedDocs={d.uploadedDocs}
+        onChange={(docs) => u({ uploadedDocs: docs })}
+      />
 
-      <div className="space-y-3 mb-10">
-        {DOCS.map((doc) => (
-          <FileZone
-            key={doc.key}
-            docKey={doc.key}
-            label={doc.label}
-            required={doc.required}
-            accept={doc.accept}
-            file={d.documents[doc.key] ?? null}
-            onUpload={handleUpload}
-          />
-        ))}
+      <div className="mt-8">
+        <Btn onClick={onNext} disabled={!hasAtLeastOne}>
+          Voir le récapitulatif <Arrow />
+        </Btn>
+        {!hasAtLeastOne && (
+          <p className="mt-3 text-[11px] text-black/30">
+            Déposez au moins un document pour continuer.
+          </p>
+        )}
       </div>
-
-      <Btn onClick={onNext} disabled={!allRequired}>
-        Voir le récapitulatif <Arrow />
-      </Btn>
-      {!allRequired && (
-        <p className="mt-3 text-[11px] text-black/30">
-          Déposez les documents marqués « Requis » pour continuer.
-        </p>
-      )}
     </div>
   );
 }
@@ -852,10 +765,12 @@ function RecapBlock({ title, rows }: { title: string; rows: { label: string; val
   );
 }
 
-function Step7({ d, onSubmit, onBack }: {
+function Step7({ d, onSubmit, onBack, submitting, submitError }: {
   d: EnrollmentData;
   onSubmit: () => void;
   onBack: () => void;
+  submitting: boolean;
+  submitError: string | null;
 }) {
   return (
     <div>
@@ -905,28 +820,25 @@ function Step7({ d, onSubmit, onBack }: {
         { label: "Tenue scolaire",   value: d.tailleUniforme ? `Taille ${d.tailleUniforme}${d.packCompletUniforme ? " · pack complet" : ""}` : "Non" },
       ]} />
 
-      {/* Documents status */}
+      {/* Documents */}
       <div className="mb-6 rounded-2xl border border-black/8 overflow-hidden">
         <div className="bg-black/[0.025] px-5 py-3 border-b border-black/5">
-          <p className="text-[11px] font-bold tracking-[0.1em] uppercase text-black/40">Documents</p>
+          <p className="text-[11px] font-bold tracking-[0.1em] uppercase text-black/40">
+            Documents ({d.uploadedDocs.length})
+          </p>
         </div>
-        <div className="p-4 space-y-2.5">
-          {DOCS.map((doc) => {
-            const uploaded = !!d.documents[doc.key];
-            return (
-              <div key={doc.key} className="flex items-center gap-3">
-                <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${uploaded ? "bg-green-100" : "bg-black/5"}`}>
-                  {uploaded ? (
-                    <svg className="w-3 h-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                  ) : <span className="w-1.5 h-1.5 rounded-full bg-black/20" />}
-                </div>
-                <span className={`text-[13px] font-medium flex-1 ${uploaded ? "text-black/70" : "text-black/30"}`}>{doc.label}</span>
-                {!uploaded && doc.required && <span className="text-[10px] text-rouge/70 font-semibold">Manquant</span>}
+        <div className="p-4 space-y-2">
+          {d.uploadedDocs.map((doc, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                <svg className="w-3 h-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
               </div>
-            );
-          })}
+              <span className="text-[13px] font-medium text-black/70 flex-1 truncate">{doc.name}</span>
+              <span className="text-[11px] text-black/30 shrink-0">{(doc.size / 1024).toFixed(0)} Ko</span>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -940,8 +852,19 @@ function Step7({ d, onSubmit, onBack }: {
         </p>
       </div>
 
-      <Btn onClick={onSubmit}>
-        Envoyer la demande d&apos;inscription <Arrow />
+      {/* Submit error */}
+      {submitError && (
+        <div className="mb-4 flex items-start gap-2.5 p-4 rounded-xl bg-red-50 border border-red-100">
+          <svg className="w-4 h-4 text-red-400 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 15.75h.007v.008H12v-.008z" />
+          </svg>
+          <p className="text-[12.5px] text-red-600">{submitError}</p>
+        </div>
+      )}
+
+      <Btn onClick={onSubmit} loading={submitting}>
+        {submitting ? "Envoi en cours…" : <>Envoyer la demande d&apos;inscription <Arrow /></>}
       </Btn>
     </div>
   );
@@ -989,12 +912,12 @@ function Confirmation({ d }: { d: EnrollmentData }) {
           </svg>
           Contacter via WhatsApp
         </a>
-        <a
+        <Link
           href="/"
           className="inline-flex items-center justify-center gap-2 border border-black/10 text-black/55 font-medium px-8 py-4 rounded-full text-[13px] hover:border-black/20 hover:text-black transition-all active:scale-[0.97]"
         >
           Retour à l&apos;accueil
-        </a>
+        </Link>
       </div>
     </div>
   );
@@ -1005,8 +928,10 @@ function Confirmation({ d }: { d: EnrollmentData }) {
 // ─────────────────────────────────────────────────────────
 
 export default function MultiStepForm() {
-  const [step, setStep] = useState(0); // 0=intro, 1-7=steps, 8=confirmation
-  const [data, setData] = useState<EnrollmentData>(INITIAL);
+  const [step, setStep]           = useState(0); // 0=intro, 1-7=steps, 8=confirmation
+  const [data, setData]           = useState<EnrollmentData>(INITIAL);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const u = useCallback(
     (patch: Partial<EnrollmentData>) => setData((d) => ({ ...d, ...patch })),
@@ -1014,6 +939,57 @@ export default function MultiStepForm() {
   );
   const next = () => { setStep((s) => s + 1); window.scrollTo({ top: 0, behavior: "smooth" }); };
   const back = () => { setStep((s) => s - 1); window.scrollTo({ top: 0, behavior: "smooth" }); };
+
+  const handleSubmit = useCallback(async () => {
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const res = await fetch("/api/inscriptions/submit", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          typeDemande:        data.typeDemande,
+          classeDemandee:     data.classeDemandee,
+          ageEnfant:          data.ageEnfant,
+          anneeScolaire:      data.anneeScolaire,
+          prenomEleve:        data.prenomEleve,
+          nomEleve:           data.nomEleve,
+          dateNaissance:      data.dateNaissance,
+          sexe:               data.sexe,
+          nationalite:        data.nationalite,
+          ecoleActuelle:      data.ecoleActuelle,
+          nomPere:            data.nomPere,
+          telephonePere:      data.telephonePere,
+          professionPere:     data.professionPere,
+          nomMere:            data.nomMere,
+          telephoneMere:      data.telephoneMere,
+          professionMere:     data.professionMere,
+          emailPrincipal:     data.emailPrincipal,
+          whatsapp:           data.whatsapp,
+          quartier:           data.quartier,
+          ville:              data.ville,
+          pays:               data.pays,
+          cantine:            data.cantine,
+          etudesDirigees:     data.etudesDirigees,
+          transport:          data.transport,
+          packFournitures:    data.packFournitures,
+          tailleUniforme:     data.tailleUniforme,
+          packCompletUniforme: data.packCompletUniforme,
+          uploadedDocs:       data.uploadedDocs,
+        }),
+      });
+      const json = await res.json() as { ok: boolean; error?: string };
+      if (!json.ok) {
+        setSubmitError(json.error ?? "Erreur lors de l'envoi.");
+        setSubmitting(false);
+        return;
+      }
+      next();
+    } catch {
+      setSubmitError("Erreur réseau. Veuillez réessayer.");
+      setSubmitting(false);
+    }
+  }, [data]);
 
   const screens: Record<number, React.ReactNode> = {
     0: <StepIntro onNext={next} />,
@@ -1023,7 +999,7 @@ export default function MultiStepForm() {
     4: <Step4 d={data} u={u} onNext={next} onBack={back} />,
     5: <Step5 d={data} u={u} onNext={next} onBack={back} />,
     6: <Step6 d={data} u={u} onNext={next} onBack={back} />,
-    7: <Step7 d={data} onSubmit={next} onBack={back} />,
+    7: <Step7 d={data} onSubmit={handleSubmit} onBack={back} submitting={submitting} submitError={submitError} />,
     8: <Confirmation d={data} />,
   };
 

@@ -24,6 +24,9 @@
 .DS_Store
 *.pem
 
+# Vidéos de développement à la racine (trop lourdes pour git)
+/hero2.mp4
+
 # debug
 npm-debug.log*
 yarn-debug.log*

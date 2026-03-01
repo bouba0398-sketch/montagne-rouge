@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import FlowShell from "./FlowShell";
 import { Field, Input, Select, ChipGroup, StepHeading, SuccessScreen } from "./FlowPrimitives";
+import FileUploadStep, { type SelectedFile } from "./FileUploadStep";
 
 const STORAGE_KEY = "mr_flow_nouvelle_inscription";
 
@@ -22,36 +23,30 @@ interface FormData {
   lienParente:   string;
   telephone:     string;
   email:         string;
-  docsConfirmed: boolean;
 }
 
 const INITIAL: FormData = {
   niveau: "", annee: "", prenomEleve: "", nomEleve: "", dateNaissance: "",
   sexe: "", ecoleActuelle: "", nomParent: "", lienParente: "", telephone: "", email: "",
-  docsConfirmed: false,
 };
 
 const STEPS = [
   { label: "Niveau" },
   { label: "Élève" },
   { label: "Parent" },
+  { label: "Documents" },
   { label: "Validation" },
 ];
 
 type Errors = Partial<Record<keyof FormData, string>>;
 
-const DOCS = [
-  "Photocopie de l'acte de naissance",
-  "Bulletins des 2 dernières années",
-  "2 photos d'identité (4×4, fond blanc)",
-  "Copie CNI parent ou tuteur",
-];
-
 export default function FlowNouvelleInscription() {
   const [step,       setStep]       = useState(0);
   const [form,       setForm]       = useState<FormData>(INITIAL);
+  const [files,      setFiles]      = useState<SelectedFile[]>([]);
   const [errors,     setErrors]     = useState<Errors>({});
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [done,       setDone]       = useState(false);
 
   useEffect(() => {
@@ -71,14 +66,14 @@ export default function FlowNouvelleInscription() {
       if (!form.annee)  e.annee  = "Choisissez une année.";
     }
     if (step === 1) {
-      if (!form.prenomEleve.trim()) e.prenomEleve = "Prénom requis.";
-      if (!form.nomEleve.trim())    e.nomEleve    = "Nom requis.";
+      if (!form.prenomEleve.trim()) e.prenomEleve   = "Prénom requis.";
+      if (!form.nomEleve.trim())    e.nomEleve      = "Nom requis.";
       if (!form.dateNaissance)      e.dateNaissance = "Date de naissance requise.";
-      if (!form.sexe)               e.sexe = "Veuillez sélectionner.";
+      if (!form.sexe)               e.sexe          = "Veuillez sélectionner.";
     }
     if (step === 2) {
-      if (!form.nomParent.trim())   e.nomParent   = "Nom requis.";
-      if (!form.telephone.trim())   e.telephone   = "Téléphone requis.";
+      if (!form.nomParent.trim())  e.nomParent  = "Nom requis.";
+      if (!form.telephone.trim())  e.telephone  = "Téléphone requis.";
     }
     setErrors(e);
     return !Object.keys(e).length;
@@ -87,23 +82,51 @@ export default function FlowNouvelleInscription() {
   async function handleNext() {
     if (!validateStep()) return;
     if (step < STEPS.length - 1) { setStep((s) => s + 1); return; }
+
+    // Last step — submit
+    const hasFileErrors = files.some((f) => f.error);
+    if (hasFileErrors) return; // block if file errors present
+
     setSubmitting(true);
+    setSubmitError(null);
     try {
-      await fetch("/api/inscriptions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "nouvelle_inscription", ...form }),
-      });
+      const fd = new FormData();
+      fd.append("hp",                   "");
+      fd.append("type_demande",         "nouvelle_inscription");
+      fd.append("niveau",               form.niveau);
+      fd.append("annee",                form.annee);
+      fd.append("eleve_prenom",         form.prenomEleve);
+      fd.append("eleve_nom",            form.nomEleve);
+      fd.append("eleve_date_naissance", form.dateNaissance);
+      fd.append("eleve_sexe",           form.sexe);
+      fd.append("eleve_ecole_actuelle", form.ecoleActuelle);
+      fd.append("parent_nom",           form.nomParent);
+      fd.append("parent_lien",          form.lienParente);
+      fd.append("parent_telephone",     form.telephone);
+      fd.append("parent_email",         form.email);
+      files.filter((f) => !f.error).forEach((f) => fd.append("files", f.file));
+
+      const res  = await fetch("/api/inscription", { method: "POST", body: fd });
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error ?? "Erreur serveur.");
+
       localStorage.removeItem(STORAGE_KEY);
       setDone(true);
-    } finally { setSubmitting(false); }
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : "Erreur réseau. Veuillez réessayer.");
+    } finally {
+      setSubmitting(false);
+    }
   }
+
+  const hasFileErrors = files.some((f) => f.error);
 
   const canProceed =
     step === 0 ? !!form.niveau && !!form.annee :
     step === 1 ? !!form.prenomEleve.trim() && !!form.nomEleve.trim() && !!form.dateNaissance && !!form.sexe :
     step === 2 ? !!form.nomParent.trim() && !!form.telephone.trim() :
-    form.docsConfirmed;
+    step === 3 ? !hasFileErrors :   // docs encouraged, not required; block on errors
+    !hasFileErrors;                 // validation step
 
   if (done) {
     return (
@@ -111,7 +134,7 @@ export default function FlowNouvelleInscription() {
         <div className="max-w-md w-full">
           <SuccessScreen
             title="Dossier reçu"
-            message={`Dossier de ${form.prenomEleve} reçu. Notre équipe vous contactera sous 5 jours ouvrés.`}
+            message={`Le dossier de ${form.prenomEleve} a bien été enregistré. Notre équipe vous contactera sous 5 jours ouvrés.`}
             nextSteps={[
               "Confirmation de réception sous 24 h",
               "Visite de l'établissement (si souhaitée)",
@@ -139,7 +162,7 @@ export default function FlowNouvelleInscription() {
     >
       {step === 0 && (
         <div className="space-y-7">
-          <StepHeading>Niveau & année scolaire</StepHeading>
+          <StepHeading>Niveau &amp; année scolaire</StepHeading>
           <Field label="Niveau souhaité" required error={errors.niveau}>
             <div className="mt-1"><ChipGroup options={NIVEAUX} value={form.niveau} onChange={(v) => set("niveau", v as string)} /></div>
           </Field>
@@ -201,47 +224,39 @@ export default function FlowNouvelleInscription() {
       )}
 
       {step === 3 && (
+        <div className="space-y-2">
+          <StepHeading>Documents justificatifs</StepHeading>
+          <FileUploadStep files={files} onChange={setFiles} />
+        </div>
+      )}
+
+      {step === 4 && (
         <div className="space-y-6">
           <StepHeading>Validation du dossier</StepHeading>
 
-          {/* Recap */}
           <div className="rounded-2xl bg-black/[0.03] p-5 space-y-2 text-sm">
             <p className="font-semibold text-black mb-3">Récapitulatif</p>
             <p className="text-black/55"><span className="font-medium text-black">Élève :</span> {form.prenomEleve} {form.nomEleve}</p>
             <p className="text-black/55"><span className="font-medium text-black">Niveau :</span> {form.niveau} · {form.annee}</p>
             <p className="text-black/55"><span className="font-medium text-black">Parent :</span> {form.nomParent}</p>
             <p className="text-black/55"><span className="font-medium text-black">Téléphone :</span> {form.telephone}</p>
+            {files.filter((f) => !f.error).length > 0 && (
+              <p className="text-black/55">
+                <span className="font-medium text-black">Documents :</span>{" "}
+                {files.filter((f) => !f.error).length} fichier{files.filter((f) => !f.error).length > 1 ? "s" : ""} joint{files.filter((f) => !f.error).length > 1 ? "s" : ""}
+              </p>
+            )}
           </div>
 
-          {/* Docs checklist */}
-          <div>
-            <p className="text-sm font-semibold text-black mb-3">Documents à apporter lors de la visite</p>
-            <ul className="space-y-2.5">
-              {DOCS.map((doc, i) => (
-                <li key={i} className="flex items-center gap-2.5 text-sm text-black/60">
-                  <span className="w-4 h-4 rounded-full bg-rouge/10 flex items-center justify-center shrink-0">
-                    <svg className="w-2.5 h-2.5 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                  </span>
-                  {doc}
-                </li>
-              ))}
-            </ul>
-          </div>
+          <p className="text-sm text-black/45 leading-relaxed">
+            En soumettant ce formulaire, vous autorisez Montagne Rouge à traiter ces informations dans le cadre de votre demande d&apos;inscription.
+          </p>
 
-          {/* Confirm checkbox */}
-          <label className="flex items-start gap-3 cursor-pointer group">
-            <input
-              type="checkbox"
-              checked={form.docsConfirmed}
-              onChange={(e) => set("docsConfirmed", e.target.checked)}
-              className="mt-0.5 w-4 h-4 rounded border-black/20 text-rouge accent-rouge cursor-pointer"
-            />
-            <span className="text-sm text-black/60 leading-relaxed group-hover:text-black/70 transition-colors">
-              Je confirme avoir pris note des documents nécessaires et accepte d&apos;être contacté par Montagne Rouge.
-            </span>
-          </label>
+          {submitError && (
+            <div className="rounded-2xl bg-red-50 border border-red-200 px-4 py-3">
+              <p className="text-sm text-red-600 font-medium">{submitError}</p>
+            </div>
+          )}
         </div>
       )}
     </FlowShell>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import FlowShell from "./FlowShell";
 import { Field, Input, ChipGroup, StepHeading, SuccessScreen } from "./FlowPrimitives";
+import FileUploadStep, { type SelectedFile } from "./FileUploadStep";
 
 const STORAGE_KEY = "mr_flow_reinscription";
 
@@ -26,17 +27,20 @@ const INITIAL: FormData = {
 const STEPS = [
   { label: "Identification" },
   { label: "Mise à jour" },
+  { label: "Documents" },
   { label: "Confirmation" },
 ];
 
 type Errors = Partial<Record<keyof FormData, string>>;
 
 export default function FlowReinscription() {
-  const [step,       setStep]       = useState(0);
-  const [form,       setForm]       = useState<FormData>(INITIAL);
-  const [errors,     setErrors]     = useState<Errors>({});
-  const [submitting, setSubmitting] = useState(false);
-  const [done,       setDone]       = useState(false);
+  const [step,        setStep]        = useState(0);
+  const [form,        setForm]        = useState<FormData>(INITIAL);
+  const [files,       setFiles]       = useState<SelectedFile[]>([]);
+  const [errors,      setErrors]      = useState<Errors>({});
+  const [submitting,  setSubmitting]  = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [done,        setDone]        = useState(false);
 
   useEffect(() => {
     try { const s = localStorage.getItem(STORAGE_KEY); if (s) setForm(JSON.parse(s)); } catch { /**/ }
@@ -65,22 +69,45 @@ export default function FlowReinscription() {
   async function handleNext() {
     if (!validateStep()) return;
     if (step < STEPS.length - 1) { setStep((s) => s + 1); return; }
+
+    const hasFileErrors = files.some((f) => f.error);
+    if (hasFileErrors) return;
+
     setSubmitting(true);
+    setSubmitError(null);
     try {
-      await fetch("/api/inscriptions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "reinscription", ...form }),
-      });
+      const fd = new FormData();
+      fd.append("hp",              "");
+      fd.append("type_demande",    "reinscription");
+      fd.append("eleve_prenom",    form.prenomEleve);
+      fd.append("eleve_nom",       form.nomEleve);
+      fd.append("classe_actuelle", form.classeActuelle);
+      fd.append("parent_nom",      `${form.prenomEleve} ${form.nomEleve} (parent)`);
+      fd.append("parent_telephone", form.telephone);
+      fd.append("parent_email",    form.email);
+      fd.append("changements",     form.changements);
+      files.filter((f) => !f.error).forEach((f) => fd.append("files", f.file));
+
+      const res  = await fetch("/api/inscription", { method: "POST", body: fd });
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error ?? "Erreur serveur.");
+
       localStorage.removeItem(STORAGE_KEY);
       setDone(true);
-    } finally { setSubmitting(false); }
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : "Erreur réseau. Veuillez réessayer.");
+    } finally {
+      setSubmitting(false);
+    }
   }
+
+  const hasFileErrors = files.some((f) => f.error);
 
   const canProceed =
     step === 0 ? !!form.prenomEleve.trim() && !!form.nomEleve.trim() && !!form.classeActuelle :
     step === 1 ? !!form.telephone.trim() :
-    true;
+    step === 2 ? !hasFileErrors :
+    !hasFileErrors;
 
   if (done) {
     return (
@@ -157,6 +184,13 @@ export default function FlowReinscription() {
       )}
 
       {step === 2 && (
+        <div className="space-y-2">
+          <StepHeading>Documents justificatifs</StepHeading>
+          <FileUploadStep files={files} onChange={setFiles} />
+        </div>
+      )}
+
+      {step === 3 && (
         <div className="space-y-5">
           <StepHeading>Confirmation</StepHeading>
           <div className="rounded-2xl bg-black/[0.03] p-5 space-y-2 text-sm">
@@ -166,11 +200,22 @@ export default function FlowReinscription() {
             <p className="text-black/55"><span className="font-medium text-black">Téléphone :</span> {form.telephone}</p>
             {form.email && <p className="text-black/55"><span className="font-medium text-black">Email :</span> {form.email}</p>}
             {form.changements && <p className="text-black/55"><span className="font-medium text-black">Changements :</span> {form.changements}</p>}
+            {files.filter((f) => !f.error).length > 0 && (
+              <p className="text-black/55">
+                <span className="font-medium text-black">Documents :</span>{" "}
+                {files.filter((f) => !f.error).length} fichier{files.filter((f) => !f.error).length > 1 ? "s" : ""} joint{files.filter((f) => !f.error).length > 1 ? "s" : ""}
+              </p>
+            )}
           </div>
           <p className="text-sm text-black/45 leading-relaxed">
             En soumettant ce formulaire, vous confirmez la réinscription de votre enfant pour l&apos;année 2025–2026.
             Notre équipe vous contactera pour finaliser.
           </p>
+          {submitError && (
+            <div className="rounded-2xl bg-red-50 border border-red-200 px-4 py-3">
+              <p className="text-sm text-red-600 font-medium">{submitError}</p>
+            </div>
+          )}
         </div>
       )}
     </FlowShell>

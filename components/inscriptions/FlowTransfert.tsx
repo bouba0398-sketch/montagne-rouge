@@ -3,51 +3,46 @@
 import { useState, useEffect } from "react";
 import FlowShell from "./FlowShell";
 import { Field, Input, Textarea, ChipGroup, StepHeading, SuccessScreen } from "./FlowPrimitives";
+import FileUploadStep, { type SelectedFile } from "./FileUploadStep";
 
 const STORAGE_KEY = "mr_flow_transfert";
 
 const NIVEAUX = ["Maternelle", "Élémentaire", "Collège", "Lycée"];
 
 interface FormData {
-  niveau:          string;
-  dateArrivee:     string;
-  nomEcole:        string;
-  villeEcole:      string;
-  motif:           string;
-  nomParent:       string;
-  telephone:       string;
-  email:           string;
-  docsConfirmed:   boolean;
+  niveau:      string;
+  dateArrivee: string;
+  nomEcole:    string;
+  villeEcole:  string;
+  motif:       string;
+  nomParent:   string;
+  telephone:   string;
+  email:       string;
 }
 
 const INITIAL: FormData = {
   niveau: "", dateArrivee: "", nomEcole: "", villeEcole: "", motif: "",
-  nomParent: "", telephone: "", email: "", docsConfirmed: false,
+  nomParent: "", telephone: "", email: "",
 };
 
 const STEPS = [
   { label: "Niveau" },
   { label: "École actuelle" },
   { label: "Coordonnées" },
+  { label: "Documents" },
   { label: "Validation" },
 ];
 
 type Errors = Partial<Record<keyof FormData, string>>;
 
-const DOCS_TRANSFERT = [
-  "Certificat de radiation de l'établissement actuel",
-  "Bulletins des 2 dernières années",
-  "Acte de naissance",
-  "2 photos d'identité (4×4, fond blanc)",
-  "Copie CNI parent ou tuteur",
-];
-
 export default function FlowTransfert() {
-  const [step,       setStep]       = useState(0);
-  const [form,       setForm]       = useState<FormData>(INITIAL);
-  const [errors,     setErrors]     = useState<Errors>({});
-  const [submitting, setSubmitting] = useState(false);
-  const [done,       setDone]       = useState(false);
+  const [step,        setStep]        = useState(0);
+  const [form,        setForm]        = useState<FormData>(INITIAL);
+  const [files,       setFiles]       = useState<SelectedFile[]>([]);
+  const [errors,      setErrors]      = useState<Errors>({});
+  const [submitting,  setSubmitting]  = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [done,        setDone]        = useState(false);
 
   useEffect(() => {
     try { const s = localStorage.getItem(STORAGE_KEY); if (s) setForm(JSON.parse(s)); } catch { /**/ }
@@ -61,8 +56,8 @@ export default function FlowTransfert() {
 
   function validateStep(): boolean {
     const e: Errors = {};
-    if (step === 0) { if (!form.niveau) e.niveau = "Choisissez un niveau."; }
-    if (step === 1) { if (!form.nomEcole.trim()) e.nomEcole = "Nom de l'école requis."; }
+    if (step === 0) { if (!form.niveau)           e.niveau    = "Choisissez un niveau."; }
+    if (step === 1) { if (!form.nomEcole.trim())   e.nomEcole  = "Nom de l'école requis."; }
     if (step === 2) {
       if (!form.nomParent.trim())  e.nomParent  = "Nom requis.";
       if (!form.telephone.trim())  e.telephone  = "Téléphone requis.";
@@ -74,23 +69,47 @@ export default function FlowTransfert() {
   async function handleNext() {
     if (!validateStep()) return;
     if (step < STEPS.length - 1) { setStep((s) => s + 1); return; }
+
+    const hasFileErrors = files.some((f) => f.error);
+    if (hasFileErrors) return;
+
     setSubmitting(true);
+    setSubmitError(null);
     try {
-      await fetch("/api/inscriptions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "transfert", ...form }),
-      });
+      const fd = new FormData();
+      fd.append("hp",                  "");
+      fd.append("type_demande",        "transfert");
+      fd.append("niveau",              form.niveau);
+      fd.append("date_arrivee",        form.dateArrivee);
+      fd.append("nom_ecole_origine",   form.nomEcole);
+      fd.append("ville_ecole_origine", form.villeEcole);
+      fd.append("motif_transfert",     form.motif);
+      fd.append("parent_nom",          form.nomParent);
+      fd.append("parent_telephone",    form.telephone);
+      fd.append("parent_email",        form.email);
+      files.filter((f) => !f.error).forEach((f) => fd.append("files", f.file));
+
+      const res  = await fetch("/api/inscription", { method: "POST", body: fd });
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error ?? "Erreur serveur.");
+
       localStorage.removeItem(STORAGE_KEY);
       setDone(true);
-    } finally { setSubmitting(false); }
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : "Erreur réseau. Veuillez réessayer.");
+    } finally {
+      setSubmitting(false);
+    }
   }
+
+  const hasFileErrors = files.some((f) => f.error);
 
   const canProceed =
     step === 0 ? !!form.niveau :
     step === 1 ? !!form.nomEcole.trim() :
     step === 2 ? !!form.nomParent.trim() && !!form.telephone.trim() :
-    form.docsConfirmed;
+    step === 3 ? !hasFileErrors :
+    !hasFileErrors;
 
   if (done) {
     return (
@@ -126,7 +145,7 @@ export default function FlowTransfert() {
     >
       {step === 0 && (
         <div className="space-y-7">
-          <StepHeading>Niveau & date souhaitée</StepHeading>
+          <StepHeading>Niveau &amp; date souhaitée</StepHeading>
           <Field label="Niveau souhaité" required error={errors.niveau}>
             <div className="mt-1"><ChipGroup options={NIVEAUX} value={form.niveau} onChange={(v) => set("niveau", v as string)} /></div>
           </Field>
@@ -173,43 +192,34 @@ export default function FlowTransfert() {
       )}
 
       {step === 3 && (
-        <div className="space-y-6">
-          <StepHeading>Documents & validation</StepHeading>
+        <div className="space-y-2">
+          <StepHeading>Documents justificatifs</StepHeading>
+          <FileUploadStep files={files} onChange={setFiles} />
+        </div>
+      )}
 
-          <div className="rounded-2xl bg-black/[0.03] p-5 space-y-2 text-sm mb-2">
+      {step === 4 && (
+        <div className="space-y-6">
+          <StepHeading>Validation du dossier</StepHeading>
+
+          <div className="rounded-2xl bg-black/[0.03] p-5 space-y-2 text-sm">
             <p className="font-semibold text-black mb-3">Récapitulatif</p>
             <p className="text-black/55"><span className="font-medium text-black">Niveau :</span> {form.niveau}</p>
             <p className="text-black/55"><span className="font-medium text-black">École actuelle :</span> {form.nomEcole}{form.villeEcole ? ` · ${form.villeEcole}` : ""}</p>
             <p className="text-black/55"><span className="font-medium text-black">Contact :</span> {form.nomParent} · {form.telephone}</p>
+            {files.filter((f) => !f.error).length > 0 && (
+              <p className="text-black/55">
+                <span className="font-medium text-black">Documents :</span>{" "}
+                {files.filter((f) => !f.error).length} fichier{files.filter((f) => !f.error).length > 1 ? "s" : ""} joint{files.filter((f) => !f.error).length > 1 ? "s" : ""}
+              </p>
+            )}
           </div>
 
-          <div>
-            <p className="text-sm font-semibold text-black mb-3">Documents à remettre</p>
-            <ul className="space-y-2.5">
-              {DOCS_TRANSFERT.map((doc, i) => (
-                <li key={i} className="flex items-center gap-2.5 text-sm text-black/60">
-                  <span className="w-4 h-4 rounded-full bg-rouge/10 flex items-center justify-center shrink-0">
-                    <svg className="w-2.5 h-2.5 text-rouge" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                  </span>
-                  {doc}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <label className="flex items-start gap-3 cursor-pointer group">
-            <input
-              type="checkbox"
-              checked={form.docsConfirmed}
-              onChange={(e) => set("docsConfirmed", e.target.checked)}
-              className="mt-0.5 w-4 h-4 rounded border-black/20 accent-rouge cursor-pointer"
-            />
-            <span className="text-sm text-black/60 leading-relaxed group-hover:text-black/70 transition-colors">
-              Je confirme avoir pris note des documents nécessaires et accepte d&apos;être contacté par Montagne Rouge.
-            </span>
-          </label>
+          {submitError && (
+            <div className="rounded-2xl bg-red-50 border border-red-200 px-4 py-3">
+              <p className="text-sm text-red-600 font-medium">{submitError}</p>
+            </div>
+          )}
         </div>
       )}
     </FlowShell>

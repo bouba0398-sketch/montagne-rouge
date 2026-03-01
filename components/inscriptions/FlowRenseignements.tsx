@@ -66,19 +66,33 @@ export default function FlowRenseignements() {
     return !Object.keys(e).length;
   }
 
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   async function handleNext() {
     if (!validateStep()) return;
     if (step < STEPS.length - 1) { setStep((s) => s + 1); return; }
     // Last step — submit
     setSubmitting(true);
+    setSubmitError(null);
     try {
-      await fetch("/api/inscriptions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "renseignements", ...form }),
-      });
+      const fd = new FormData();
+      fd.append("hp",             "");
+      fd.append("type_demande",   "renseignement");
+      fd.append("sujets",         JSON.stringify(form.sujets));
+      fd.append("niveau",         form.niveau);
+      fd.append("parent_nom",     form.nom);
+      fd.append("parent_telephone", form.telephone);
+      fd.append("parent_email",   form.email);
+      fd.append("message",        form.message);
+
+      const res  = await fetch("/api/inscription", { method: "POST", body: fd });
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error ?? "Erreur serveur.");
+
       localStorage.removeItem(STORAGE_KEY);
       setDone(true);
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : "Erreur réseau. Veuillez réessayer.");
     } finally {
       setSubmitting(false);
     }
@@ -163,6 +177,11 @@ export default function FlowRenseignements() {
             {form.niveau && <p className="text-black/55"><span className="font-medium text-black">Niveau :</span> {form.niveau}</p>}
             <p className="text-black/55"><span className="font-medium text-black">Contact :</span> {form.nom} · {form.telephone}</p>
           </div>
+          {submitError && (
+            <div className="rounded-2xl bg-red-50 border border-red-200 px-4 py-3">
+              <p className="text-sm text-red-600 font-medium">{submitError}</p>
+            </div>
+          )}
         </div>
       )}
     </FlowShell>

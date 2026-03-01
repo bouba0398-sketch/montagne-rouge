@@ -1,7 +1,7 @@
 import { Resend } from "resend";
 
 const TO   = process.env.EMAIL_TO ?? "bouba0398@gmail.com";
-const FROM = "Montagne Rouge <onboarding@resend.dev>";
+const FROM = "Montagne Rouge <contact@montagnerouge.com>";
 
 /* ── Rate limiting (in-memory, resets on server restart) ── */
 const rateMap = new Map<string, { count: number; resetAt: number }>();
